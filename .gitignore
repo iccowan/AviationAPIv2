@@ -36,5 +36,8 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-**/__pycache__/*
-**/dependencies/*
+**/__pycache__
+**/build
+**/build.zip
+
+**/.DS_Store
