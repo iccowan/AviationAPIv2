@@ -40,11 +40,11 @@ resource "aws_api_gateway_deployment" "deployment" {
 resource "aws_api_gateway_stage" "deployment" {
   deployment_id = aws_api_gateway_deployment.deployment.id
   rest_api_id   = aws_api_gateway_rest_api.aviationapi.id
-  stage_name    = "sandbox"
+  stage_name    = var.ENV
   }
 
 resource "aws_acm_certificate" "aviationapi" {
-  domain_name = "api-v2.aviationapi.com"
+  domain_name = "api${var.SUBDOMAIN_APPEND}.aviationapi.com"
   validation_method = "DNS"
 
   lifecycle {
@@ -62,12 +62,13 @@ resource "aws_api_gateway_domain_name" "aviationapi" {
   ]
 
   certificate_arn = aws_acm_certificate_validation.aviationapi.certificate_arn
-  domain_name = "api-v2.aviationapi.com"
+  domain_name = "api${var.SUBDOMAIN_APPEND}.aviationapi.com"
 }
 
 resource "aws_api_gateway_base_path_mapping" "aviationapi" {
   api_id = aws_api_gateway_rest_api.aviationapi.id
   stage_name = aws_api_gateway_stage.deployment.stage_name
   domain_name = aws_api_gateway_domain_name.aviationapi.domain_name
+  base_path = "v2"
 }
 

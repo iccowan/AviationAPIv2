@@ -9,3 +9,6 @@ variable "SOURCE_DIR" {
 variable "OUTPUT_PATH" {
   default = "../api/build.zip"
 }
+
+variable "ENV" {}
+variable "SUBDOMAIN_APPEND" {}

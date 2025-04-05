@@ -16,6 +16,10 @@ resource "aws_lambda_function" "aviationapi_lambda" {
   source_code_hash = data.archive_file.api_lambda.output_base64sha256
 
   role = aws_iam_role.lambda_role.arn
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role" "lambda_role" {
