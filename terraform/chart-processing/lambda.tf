@@ -23,7 +23,7 @@ resource "aws_lambda_function" "aviationapi_chart_processor_lambda" {
 
   environment {
     variables = {
-      DOWNLOAD_PATH = "/tmp"
+      DOWNLOAD_PATH  = "/tmp"
       S3_BUCKET_NAME = var.S3_BUCKET.bucket
       UPLOAD_THREADS = 100
     }
