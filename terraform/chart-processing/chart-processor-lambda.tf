@@ -59,14 +59,27 @@ resource "aws_iam_role_policy" "lambda_chart_processor_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = "s3:ListBucket"
-        Resource = var.S3_BUCKET.arn
-      },
-      {
+        Sid = "S3PutObject"
         Effect   = "Allow"
         Action   = "s3:PutObject",
         Resource = "${var.S3_BUCKET.arn}/*"
+      },
+      {
+        Sid = "ReadWriteTable"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:BatchGetItem",
+          "dynamodb:GetItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:BatchWriteItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem"
+        ],
+        Resource = [
+          var.AIRPORTS_TABLE_ARN,
+          var.AIRAC_TABLE_ARN
+        ]
       }
     ]
   })
