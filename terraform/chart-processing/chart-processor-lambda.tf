@@ -18,7 +18,7 @@ resource "aws_lambda_function" "aviationapi_chart_processor_lambda" {
   role = aws_iam_role.chart_processor_lambda_role.arn
 
   ephemeral_storage {
-    size = 2048
+    size = 3072
   }
 
   environment {

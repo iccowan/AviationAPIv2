@@ -29,6 +29,7 @@ def unzip_charts(download_path, file_name):
     return charts_path
 
 def combine_associated_charts(charts_path):
+    logInfo('Combining associated charts')
     chart_multiple_page_counts = {}
 
     for root, dir, files in os.walk(charts_path):
@@ -65,6 +66,8 @@ def combine_associated_charts(charts_path):
 
         for file in to_be_deleted:
             os.remove(file)
+
+    logInfo('Finished combining charts')
 
 def upload_file_s3(s3_client, path, bucket_name, object_name):
     s3_client.upload_file(path, bucket_name, object_name)
