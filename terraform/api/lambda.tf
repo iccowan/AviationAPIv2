@@ -1,6 +1,6 @@
 data "archive_file" "api_lambda" {
-  type = "zip"
-  source_dir = var.SOURCE_DIR
+  type        = "zip"
+  source_dir  = var.SOURCE_DIR
   output_path = var.OUTPUT_PATH
 }
 
@@ -12,7 +12,7 @@ resource "aws_lambda_function" "aviationapi_lambda" {
   memory_size = 256
   timeout     = 10
 
-  filename = var.OUTPUT_PATH
+  filename         = var.OUTPUT_PATH
   source_code_hash = data.archive_file.api_lambda.output_base64sha256
 
   role = aws_iam_role.lambda_role.arn

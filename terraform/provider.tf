@@ -9,4 +9,8 @@ terraform {
 
 provider "aws" {
   region = var.AWS_REGION
+
+  endpoints {
+    dynamodb = var.DYNAMODB_ENDPOINT
+  }
 }

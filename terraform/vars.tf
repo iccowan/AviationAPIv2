@@ -9,3 +9,7 @@ variable "ENV" {
 variable "SUBDOMAIN_APPEND" {
   default = "-sandbox"
 }
+
+variable "DYNAMODB_ENDPOINT" {
+  default = ""
+}
