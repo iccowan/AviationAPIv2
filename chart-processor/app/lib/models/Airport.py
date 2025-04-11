@@ -1,4 +1,4 @@
-from app.lib.models.AirportData import AirportData
+from app.lib.models.AirportData import AirportData, AirportDataEncoder
 
 
 class Airport:
@@ -9,6 +9,8 @@ class Airport:
         "arrival": 3,
         "approach": 4,
     }
+
+    TABLE_NAME = 'aviationapi-airports'
 
     def __init__(self, airac):
         self.airac = airac
@@ -50,6 +52,52 @@ class Airport:
         new.approach_charts = self.approach_charts.copy()
 
         return new
+
+    def to_dynamodb_dict(self):
+        return {} | self.airport_data.to_dynamodb_dict()
+
+    def generate_dynamodb_key(self):
+        return {
+            "icao_ident": {
+                "S": self.airport_data.icao_ident,
+            }
+        }
+
+    def init_new_airport(self, dynamodb_client):
+        key = self.generate_dynamodb_key()
+        update_expression = "SET airport_data = :airport_data, airport_diagram = :airport_diagram, general_charts = :general_charts, departure_charts = :departure_charts, arrival_charts = :arrival_charts, approach_charts = :approach_charts, chart_supplement = :chart_supplement"
+        expression_attribute_values = {
+            ":airport_data": {"M": {}},
+            ":airport_diagram": {"M": {}},
+            ":general_charts": {"M": {}},
+            ":departure_charts": {"M": {}},
+            ":arrival_charts": {"M": {}},
+            ":approach_charts": {"M": {}},
+            ":chart_supplement": {"M": {}},
+        }
+        conditional_expression = "attribute_not_exists(icao_ident)"
+
+        dynamodb_client.update_item(
+            TableName=self.TABLE_NAME,
+            Key=key,
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values,
+            ConditionExpression=conditional_expression
+        )
+
+    def update_dynamodb(self, dynamodb_client):
+        self.init_new_airport(dynamodb_client)
+
+        key = self.generate_dynamodb_key()
+        update_expression = f"SET {self.airport_data.set_dynamodb_string()}"
+        expression_attribute_values = self.to_dynamodb_dict()
+
+        dynamodb_client.update_item(
+            TableName=self.TABLE_NAME,
+            Key=key,
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values,
+        )
 
     def __str__(self):
         return str(

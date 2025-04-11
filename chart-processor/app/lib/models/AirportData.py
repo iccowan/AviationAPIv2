@@ -1,10 +1,17 @@
+from json import JSONEncoder
+
+
 class AirportData:
-    def __init__(self):
+    def __init__(self, dict=None):
         self.city = ""
         self.state = ""
         self.state_full = ""
         self.country = "USA"
         self.reset_airport_specific()
+
+        if dict is not None:
+            for k, v in dict.items():
+                setattr(self, k, v)
 
     def reset_airport_specific(self):
         self.icao_ident = ""
@@ -25,6 +32,29 @@ class AirportData:
 
         return new
 
+    def to_dynamodb_dict(self):
+        return {
+            ":airport_data_city": {"S": self.city},
+            ":airport_data_state_short": {"S": self.state},
+            ":airport_data_state_full": {"S": self.state_full},
+            ":airport_data_country": {"S": self.country},
+            ":airport_data_icao_ident": {"S": self.icao_ident},
+            ":airport_data_faa_ident": {"S": self.faa_ident},
+            ":airport_data_airport_name": {"S": self.airport_name},
+            ":airport_data_is_military": {"BOOL": self.is_military},
+        }
+
+    def set_dynamodb_string(self):
+        return "" \
+            "airport_data.city = :airport_data_city," \
+            "airport_data.state_short = :airport_data_state_short," \
+            "airport_data.state_full = :airport_data_state_full," \
+            "airport_data.country = :airport_data_country," \
+            "airport_data.icao_ident = :airport_data_icao_ident," \
+            "airport_data.faa_ident = :airport_data_faa_ident," \
+            "airport_data.airport_name = :airport_data_airport_name," \
+            "airport_data.is_military = :airport_data_is_military"
+
     def __str__(self):
         return str(
             {
@@ -41,3 +71,11 @@ class AirportData:
 
     def __repr__(self):
         return self.__str__()
+
+
+class AirportDataEncoder(JSONEncoder):
+    def default(self, airport_data):
+        return airport_data.__dict__
+
+    def decode(self, json_object):
+        return AirportData(json_object)

@@ -1,6 +1,8 @@
 import os
 import xml.etree.ElementTree as ElementTree
 
+import boto3
+
 from app.lib.logger import logInfo
 from app.lib.models.Airport import Airport
 from app.lib.models.Chart import Chart
@@ -89,6 +91,7 @@ def process_xml_db(xml_document, airac):
         "chart_change": False,
     }
 
+    dynamodb_client = boto3.client("dynamodb")
     for event, element in xml_document:
         tag = element.tag.strip()
         text = element.text.strip() if element.text is not None else ""
@@ -106,10 +109,14 @@ def process_xml_db(xml_document, airac):
             current_chart = Chart()
 
         if event == END_EVENT and tag == "airport_name":
-            if current_airport.airport_data.icao_ident == "KLGA":
+            if current_airport.airport_data.icao_ident == "KLUK":
+                current_airport.update_dynamodb(dynamodb_client)
                 print(current_airport)
+
             airports.append(current_airport.copy())
             current_airport.reset_for_next_airport()
+
+    dynamodb_client.close()
 
     return airports
 

@@ -1,5 +1,8 @@
+from json import JSONEncoder
+
+
 class Chart:
-    def __init__(self):
+    def __init__(self, dict=None):
         self.chart_name = ""
         self.chart_sequence = ""
         self.pdf_name = ""
@@ -7,6 +10,10 @@ class Chart:
         self.did_change = False
         self.change_pdf_name = None
         self.change_pdf_url = None
+
+        if dict is not None:
+            for k, v in dict.items():
+                setattr(self, k, v)
 
     def __str__(self):
         return str(
@@ -23,3 +30,11 @@ class Chart:
 
     def __repr__(self):
         return self.__str__()
+
+
+class ChartEncoder(JSONEncoder):
+    def default(self, chart):
+        return chart.__dict__
+
+    def decode(self, json_object):
+        return Chart(json_object)

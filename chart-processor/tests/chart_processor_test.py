@@ -8,8 +8,7 @@ from pytest import MonkeyPatch, fixture
 
 import app
 import app.chart_processor
-from app.chart_processor import lambda_handler
-from app.chart_processor import process_standard_chart_packets
+from app.chart_processor import lambda_handler, process_standard_chart_packets
 
 
 @patch("app.chart_processor.process_standard_chart_packets")
@@ -79,11 +78,14 @@ def test_lambda_handler_calls_shutil_remove_tree(
 
     shutil_rmtree.assert_called_once_with(pathlib.Path(download_path) / "data")
 
+
 @patch("app.chart_processor.download_charts")
 @patch("app.chart_processor.unzip_charts")
 @patch("app.chart_processor.combine_associated_charts")
 @patch("app.chart_processor.push_charts_to_s3")
-def test_process_standard_chart_packets_calls_download_charts(push_charts_to_s3, combine_associated_charts, unzip_charts, download_charts):
+def test_process_standard_chart_packets_calls_download_charts(
+    push_charts_to_s3, combine_associated_charts, unzip_charts, download_charts
+):
     packet = random.choice(["A", "B", "C", "D"])
     airac = "250417"
     zip_file_download_path = "/some/download/path"
@@ -92,14 +94,17 @@ def test_process_standard_chart_packets_calls_download_charts(push_charts_to_s3,
     download_charts.return_value = (zip_file_download_path, file_name)
 
     process_standard_chart_packets(packet, airac)
-    
+
     download_charts.assert_called_once_with(packet, airac)
 
+
 @patch("app.chart_processor.download_charts")
 @patch("app.chart_processor.unzip_charts")
 @patch("app.chart_processor.combine_associated_charts")
 @patch("app.chart_processor.push_charts_to_s3")
-def test_process_standard_chart_packets_calls_unzip_charts(push_charts_to_s3, combine_associated_charts, unzip_charts, download_charts):
+def test_process_standard_chart_packets_calls_unzip_charts(
+    push_charts_to_s3, combine_associated_charts, unzip_charts, download_charts
+):
     packet = random.choice(["A", "B", "C", "D"])
     airac = "250417"
     zip_file_download_path = "/some/download/path"
@@ -110,14 +115,17 @@ def test_process_standard_chart_packets_calls_unzip_charts(push_charts_to_s3, co
     unzip_charts.return_value = charts_path
 
     process_standard_chart_packets(packet, airac)
-    
+
     unzip_charts.assert_called_once_with(zip_file_download_path, file_name)
 
+
 @patch("app.chart_processor.download_charts")
 @patch("app.chart_processor.unzip_charts")
 @patch("app.chart_processor.combine_associated_charts")
 @patch("app.chart_processor.push_charts_to_s3")
-def test_process_standard_chart_packets_calls_combine_associated_charts(push_charts_to_s3, combine_associated_charts, unzip_charts, download_charts):
+def test_process_standard_chart_packets_calls_combine_associated_charts(
+    push_charts_to_s3, combine_associated_charts, unzip_charts, download_charts
+):
     packet = random.choice(["A", "B", "C", "D"])
     airac = "250417"
     zip_file_download_path = "/some/download/path"
@@ -128,14 +136,17 @@ def test_process_standard_chart_packets_calls_combine_associated_charts(push_cha
     unzip_charts.return_value = charts_path
 
     process_standard_chart_packets(packet, airac)
-    
+
     combine_associated_charts.assert_called_once_with(charts_path)
 
+
 @patch("app.chart_processor.download_charts")
 @patch("app.chart_processor.unzip_charts")
 @patch("app.chart_processor.combine_associated_charts")
 @patch("app.chart_processor.push_charts_to_s3")
-def test_process_standard_chart_packets_calls_push_charts_to_s3(push_charts_to_s3, combine_associated_charts, unzip_charts, download_charts):
+def test_process_standard_chart_packets_calls_push_charts_to_s3(
+    push_charts_to_s3, combine_associated_charts, unzip_charts, download_charts
+):
     packet = random.choice(["A", "B", "C", "D"])
     airac = "250417"
     zip_file_download_path = "/some/download/path"
@@ -146,8 +157,8 @@ def test_process_standard_chart_packets_calls_push_charts_to_s3(push_charts_to_s
     unzip_charts.return_value = charts_path
 
     process_standard_chart_packets(packet, airac)
-    
-    push_charts_to_s3.assert_called_once_with(airac,charts_path)
+
+    push_charts_to_s3.assert_called_once_with(airac, charts_path)
 
 
 def set_env(env):
