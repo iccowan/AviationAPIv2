@@ -139,11 +139,9 @@ def download_chart_supplement(airac):
 
 def lambda_handler(event, context):
     logInfo(f'Trigger received with event: {str(event)}')
-    #attributes = event['Records'][0]['Sns']['MessageAttributes']
-    #packet = attributes['packet']['Value']
-    #airac = attributes['airac']['Value']
-    packet = 'E'
-    airac = '250417'
+    attributes = event['Records'][0]['Sns']['MessageAttributes']
+    packet = attributes['packet']['Value']
+    airac = attributes['airac']['Value']
 
     logInfo(f'packet: {packet}, airac: {airac}')
 
@@ -169,4 +167,4 @@ def lambda_handler(event, context):
     logInfo('Cleaning up drive')
     shutil.rmtree(DOWNLOAD_PATH)
     
-lambda_handler(None, None)
+#lambda_handler(None, None)
