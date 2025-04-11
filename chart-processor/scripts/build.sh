@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ABS_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-cd $ABS_PATH
+cd $ABS_PATH/..
 
 if [ -d "build" ]; then rm -rf "build"; fi
 if [ -f "build.zip" ]; then rm -f "build.zip"; fi

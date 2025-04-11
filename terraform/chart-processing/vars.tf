@@ -13,3 +13,4 @@ variable "OUTPUT_PATH" {
 variable "S3_BUCKET" {}
 variable "AIRPORTS_TABLE_ARN" {}
 variable "AIRAC_TABLE_ARN" {}
+variable "CHARTS_BASE_URL" {}

@@ -1,15 +1,15 @@
 class AirportData:
     def __init__(self):
-        self.city = ''
-        self.state = ''
-        self.state_full = ''
-        self.country = 'USA'
+        self.city = ""
+        self.state = ""
+        self.state_full = ""
+        self.country = "USA"
         self.reset_airport_specific()
 
     def reset_airport_specific(self):
-        self.icao_ident = ''
-        self.faa_ident = ''
-        self.airport_name = ''
+        self.icao_ident = ""
+        self.faa_ident = ""
+        self.airport_name = ""
         self.is_military = False
 
     def copy(self):
@@ -26,17 +26,18 @@ class AirportData:
         return new
 
     def __str__(self):
-        return str({
-            'city': self.city,
-            'state': self.state,
-            'state_full': self.state_full,
-            'country': self.country,
-            'icao_ident': self.icao_ident,
-            'faa_ident': self.faa_ident,
-            'airport_name': self.airport_name,
-            'is_military': self.is_military
-        })
+        return str(
+            {
+                "city": self.city,
+                "state": self.state,
+                "state_full": self.state_full,
+                "country": self.country,
+                "icao_ident": self.icao_ident,
+                "faa_ident": self.faa_ident,
+                "airport_name": self.airport_name,
+                "is_military": self.is_military,
+            }
+        )
 
     def __repr__(self):
         return self.__str__()
-

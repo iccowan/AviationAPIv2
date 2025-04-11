@@ -12,7 +12,7 @@ resource "aws_lambda_function" "aviationapi_chart_processor_lambda" {
   timeout     = 360
 
   filename         = var.OUTPUT_PATH
-  handler          = "app.chart-processor.lambda_handler"
+  handler          = "app.chart_processor.lambda_handler"
   source_code_hash = data.archive_file.api_lambda.output_base64sha256
 
   role = aws_iam_role.chart_processor_lambda_role.arn
@@ -26,6 +26,7 @@ resource "aws_lambda_function" "aviationapi_chart_processor_lambda" {
       DOWNLOAD_PATH  = "/tmp"
       S3_BUCKET_NAME = var.S3_BUCKET.bucket
       UPLOAD_THREADS = 100
+      CHART_BASE_URL = var.CHARTS_BASE_URL
     }
   }
 
