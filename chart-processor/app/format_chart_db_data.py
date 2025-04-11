@@ -23,7 +23,9 @@ def update_current_airport_tags(current_airport, event, element, tag, text):
         current_airport.airport_data.is_military = element.attrib["military"] == "M"
 
 
-def update_current_chart_tags(current_chart, current_chart_data, airac, event, tag, text):
+def update_current_chart_tags(
+    current_chart, current_chart_data, airac, event, tag, text
+):
     if event == END_EVENT and tag == "chartseq":
         current_chart.chart_sequence = text
     if event == END_EVENT and tag == "chart_name":
@@ -92,7 +94,9 @@ def process_xml_db(xml_document, airac):
         text = element.text.strip() if element.text is not None else ""
 
         update_current_airport_tags(current_airport, event, element, tag, text)
-        update_current_chart_tags(current_chart, current_chart_data, airac, event, tag, text)
+        update_current_chart_tags(
+            current_chart, current_chart_data, airac, event, tag, text
+        )
 
         if event == END_EVENT and tag == "record":
             insert_chart_to_airport(current_airport, current_chart, current_chart_data)
