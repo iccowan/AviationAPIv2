@@ -1,5 +1,6 @@
 import os
 import pathlib
+import shutil
 import zipfile
 
 import boto3
@@ -179,9 +180,9 @@ def process_chart_packet_with_db_and_changes(packet, airac):
     zip_file_download_path, file_name = download_charts(packet, airac)
     charts_path = unzip_charts(zip_file_download_path, file_name)
     insert_charts_to_dynamodb(airac, charts_path)
-    # charts_path /= "compare_pdf"
-    # combine_associated_charts(charts_path)
-    # push_charts_to_s3(airac, charts_path)
+    charts_path /= "compare_pdf"
+    combine_associated_charts(charts_path)
+    push_charts_to_s3(airac, charts_path)
 
 
 def process_chart_supplement(airac):
@@ -190,11 +191,9 @@ def process_chart_supplement(airac):
 
 def lambda_handler(event, context):
     logInfo(f"Trigger received with event: {str(event)}")
-    # attributes = event["Records"][0]["Sns"]["MessageAttributes"]
-    # packet = attributes["packet"]["Value"]
-    # airac = attributes["airac"]["Value"]
-    packet = "E"
-    airac = "250417"
+    attributes = event["Records"][0]["Sns"]["MessageAttributes"]
+    packet = attributes["packet"]["Value"]
+    airac = attributes["airac"]["Value"]
 
     logInfo(f"packet: {packet}, airac: {airac}")
 
@@ -210,7 +209,4 @@ def lambda_handler(event, context):
             return 1
 
     logInfo("Cleaning up drive")
-    # shutil.rmtree(DOWNLOAD_PATH)
-
-
-lambda_handler(None, None)
+    shutil.rmtree(DOWNLOAD_PATH)

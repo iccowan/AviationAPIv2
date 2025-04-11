@@ -1,3 +1,6 @@
+from botocore.exceptions import ClientError
+
+from app.lib.logger import logError
 from app.lib.models.AirportData import AirportData, AirportDataEncoder
 
 
@@ -10,7 +13,7 @@ class Airport:
         "approach": 4,
     }
 
-    TABLE_NAME = 'aviationapi-airports'
+    TABLE_NAME = "aviationapi-airports"
 
     def __init__(self, airac):
         self.airac = airac
@@ -27,6 +30,8 @@ class Airport:
         self.arrival_charts = {f"airac_{self.airac}": []}
 
         self.approach_charts = {f"airac_{self.airac}": []}
+
+        self.chart_supplement = {f"airac_{self.airac}": []}
 
         self.airport_data.reset_airport_specific()
 
@@ -54,13 +59,66 @@ class Airport:
         return new
 
     def to_dynamodb_dict(self):
-        return {} | self.airport_data.to_dynamodb_dict()
+        return self.airport_data.to_dynamodb_dict() | self.charts_to_dynamodb_dicts()
 
     def generate_dynamodb_key(self):
+        id = self.airport_data.icao_ident
+        if len(id) == 0:
+            id = self.airport_data.faa_ident
+
+        return {"unique_airport_id": {"S": id}}
+
+    def charts_dynamodb_string(self):
+        return (
+            ""
+            f"airport_diagram.airac_{self.airac} = :airport_diagram,"
+            f"general_charts.airac_{self.airac} = :general_charts,"
+            f"departure_charts.airac_{self.airac} = :departure_charts,"
+            f"arrival_charts.airac_{self.airac} = :arrival_charts,"
+            f"approach_charts.airac_{self.airac} = :approach_charts,"
+            f"chart_supplement.airac_{self.airac} = :chart_supplement"
+        )
+
+    def charts_to_dynamodb_dicts(self):
+        airac_key = f"airac_{self.airac}"
+
         return {
-            "icao_ident": {
-                "S": self.airport_data.icao_ident,
-            }
+            ":airport_diagram": {
+                "L": [
+                    chart.format_for_dynamodb()
+                    for chart in self.airport_diagram[airac_key]
+                ]
+            },
+            ":general_charts": {
+                "L": [
+                    chart.format_for_dynamodb()
+                    for chart in self.general_charts[airac_key]
+                ]
+            },
+            ":departure_charts": {
+                "L": [
+                    chart.format_for_dynamodb()
+                    for chart in self.departure_charts[airac_key]
+                ]
+            },
+            ":arrival_charts": {
+                "L": [
+                    chart.format_for_dynamodb()
+                    for chart in self.arrival_charts[airac_key]
+                ]
+            },
+            ":approach_charts": {
+                "L": [
+                    chart.format_for_dynamodb()
+                    for chart in self.approach_charts[airac_key]
+                ]
+            },
+            ":chart_supplement": {
+                "L": [
+                    chart.format_for_dynamodb()
+                    for chart in self.chart_supplement[airac_key]
+                ]
+            },
         }
 
     def init_new_airport(self, dynamodb_client):
@@ -77,19 +135,26 @@ class Airport:
         }
         conditional_expression = "attribute_not_exists(icao_ident)"
 
-        dynamodb_client.update_item(
-            TableName=self.TABLE_NAME,
-            Key=key,
-            UpdateExpression=update_expression,
-            ExpressionAttributeValues=expression_attribute_values,
-            ConditionExpression=conditional_expression
-        )
+        try:
+            dynamodb_client.update_item(
+                TableName=self.TABLE_NAME,
+                Key=key,
+                UpdateExpression=update_expression,
+                ExpressionAttributeValues=expression_attribute_values,
+                ConditionExpression=conditional_expression,
+            )
+        except ClientError as e:
+            if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+                pass
+            logError(
+                f"Error inserting new airport {self.airport_data.icao_ident} {self.airport_data.faa_ident}"
+            )
 
     def update_dynamodb(self, dynamodb_client):
         self.init_new_airport(dynamodb_client)
 
         key = self.generate_dynamodb_key()
-        update_expression = f"SET {self.airport_data.set_dynamodb_string()}"
+        update_expression = f"SET {self.airport_data.set_dynamodb_string()},{self.charts_dynamodb_string()}"
         expression_attribute_values = self.to_dynamodb_dict()
 
         dynamodb_client.update_item(

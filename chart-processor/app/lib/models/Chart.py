@@ -15,6 +15,25 @@ class Chart:
             for k, v in dict.items():
                 setattr(self, k, v)
 
+    def format_for_dynamodb(self):
+        changes = {}
+        if self.did_change:
+            changes = {
+                "change_pdf_name": {"S": self.change_pdf_name},
+                "change_pdf_url": {"S": self.change_pdf_url},
+            }
+
+        return {
+            "M": {
+                "chart_name": {"S": self.chart_name},
+                "chart_sequence": {"S": self.chart_sequence},
+                "pdf_name": {"S": self.pdf_name},
+                "pdf_url": {"S": self.pdf_url},
+                "did_change": {"BOOL": self.did_change},
+            }
+            | changes
+        }
+
     def __str__(self):
         return str(
             {

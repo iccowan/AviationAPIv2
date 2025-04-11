@@ -69,12 +69,6 @@ resource "aws_iam_role_policy" "lambda_chart_processor_role" {
         Sid = "ReadWriteTable"
         Effect = "Allow"
         Action = [
-          "dynamodb:BatchGetItem",
-          "dynamodb:GetItem",
-          "dynamodb:Query",
-          "dynamodb:Scan",
-          "dynamodb:BatchWriteItem",
-          "dynamodb:PutItem",
           "dynamodb:UpdateItem"
         ],
         Resource = [

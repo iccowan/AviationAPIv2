@@ -81,7 +81,7 @@ def insert_chart_to_airport(current_airport, current_chart, current_chart_data):
 
 
 def process_xml_db(xml_document, airac):
-    airports = []
+    airports = 0
 
     current_airport = Airport(airac)
     current_chart = Chart()
@@ -109,11 +109,9 @@ def process_xml_db(xml_document, airac):
             current_chart = Chart()
 
         if event == END_EVENT and tag == "airport_name":
-            if current_airport.airport_data.icao_ident == "KLUK":
-                current_airport.update_dynamodb(dynamodb_client)
-                print(current_airport)
+            current_airport.update_dynamodb(dynamodb_client)
 
-            airports.append(current_airport.copy())
+            airports += 1
             current_airport.reset_for_next_airport()
 
     dynamodb_client.close()
@@ -131,9 +129,6 @@ def process_data(airac, files_path):
         xml_document = ElementTree.iterparse(file, [START_EVENT, END_EVENT])
         airports = process_xml_db(xml_document, airac)
 
-        logInfo(f"Finished processing data for {str(len(airports))} airports")
-        return airports
+        logInfo(f"Finished processing data for {str(airports)} airports")
     finally:
         file.close()
-
-    return []
