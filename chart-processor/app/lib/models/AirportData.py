@@ -23,6 +23,8 @@ class AirportData:
         new.airport_name = self.airport_name
         new.is_military = self.is_military
 
+        return new
+
     def __str__(self):
         return str({
             'city': self.city,

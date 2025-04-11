@@ -58,6 +58,8 @@ class Airport:
         new.arrival_charts = self.arrival_charts.copy()
         new.approach_charts = self.approach_charts.copy()
 
+        return new
+
     def __str__(self):
         return str({
             'airport_data': self.airport_data,

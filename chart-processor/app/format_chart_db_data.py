@@ -2,9 +2,12 @@ import xml.etree.ElementTree as ElementTree
 from app.lib.models.Airport import Airport
 from app.lib.models.Chart import Chart
 
-def main():
-    with open("temp/data/DDTPPE_250417/d-TPP_Metafile.xml") as file:
-        airac = '250417'
+from app.lib.logger import logInfo
+
+def process_data(airac, files_path):
+    logInfo('Beginning to process airport chart data for DynamoDB')
+    airports = []
+    with open(files_path / 'd-TPP_Metafile.xml') as file:
         START_EVENT = 'start'
         END_EVENT = 'end'
         document = ElementTree.iterparse(file, [START_EVENT, END_EVENT])
@@ -34,7 +37,7 @@ def main():
             if event == END_EVENT and tag == 'chart_name':
                 current_chart.chart_name = text
             if event == END_EVENT and tag == 'pdf_name':
-                if '_C' in text:
+                if '_C' in text or 'DELETED_JOB.PDF' in text or 'DEL_APT_SERVED.PDF' in text:
                     skip_chart = True
 
                 current_chart.pdf_name = text
@@ -68,10 +71,9 @@ def main():
                 current_chart = Chart()
 
             if event == END_EVENT and tag =='airport_name':
-                #process airport
-                if current_airport.airport_data.icao_ident == 'KAVL':
-                    print(current_airport)
-
+                airports.append(current_airport.copy())
                 current_airport.reset_for_next_airport()
 
-main()
+    logInfo(f'Finished processing data for {str(len(airports))} airports')
+    return airports
+

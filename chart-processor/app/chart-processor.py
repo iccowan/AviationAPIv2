@@ -7,9 +7,10 @@ import shutil
 import zipfile
 import boto3.s3.transfer as s3transfer
 from botocore.config import Config
-from pypdf import PdfWriter
+from pypdf import PdfWriter, PdfReader
 
 from app.lib.logger import logInfo
+import app.format_chart_db_data as ChartDataFormatter
 
 DOWNLOAD_PATH = pathlib.Path(os.environ.get('DOWNLOAD_PATH', os.getcwd() + '/temp')) / 'data'
 S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', 'aviationapi-charts')
@@ -34,8 +35,13 @@ def combine_associated_charts(charts_path):
 
     for root, dir, files in os.walk(charts_path):
         for file in files:
+            name_addition = ''
+            if '_CMP' in file:
+                file = file.replace('_CMP', '')
+                name_addition = '_CMP'
+
             file = file.split('_C')[0]
-            file = f'{root}/{file.split('.')[0]}'
+            file = f'{root}/{file.split('.PDF')[0]}{name_addition}'
 
             if file in chart_multiple_page_counts:
                 chart_multiple_page_counts[file] += 1
@@ -48,18 +54,31 @@ def combine_associated_charts(charts_path):
         
         merger = PdfWriter()
         to_be_deleted = []
-        for page_number in range(0, pages):
+        for file_number in range(0, pages):
             input_file = file_name
-            if page_number == 0:
-                input_file += '.PDF'
-            elif page_number == 1:
-                input_file += '_C.PDF'
+            name_addition = ''
+            if '_CMP' in input_file:
+                name_addition = '_CMP'
+                input_file = input_file.replace('_CMP', '')
+
+            if file_number == 0:
+                input_file += f'{name_addition}.PDF'
+            elif file_number == 1:
+                input_file += f'_C{name_addition}.PDF'
                 to_be_deleted.append(input_file)
             else:
-                input_file += f'_C{str(page_number)}.PDF'
+                input_file += f'_C{str(file_number)}{name_addition}.PDF'
                 to_be_deleted.append(input_file)
+            
+            reader = PdfReader(input_file)
+            num_pages = reader.get_num_pages()
+            reader.close()
 
-            merger.append(input_file)
+            for page_number in range(0, num_pages):
+                insert_index = (file_number * (1 + page_number)) + page_number
+                insert_range = (page_number, page_number + 1)
+
+                merger.merge(position=insert_index, fileobj=input_file, pages=insert_range)
         
         merger.write(f'{file_name}.PDF')
         merger.close()
@@ -72,7 +91,7 @@ def combine_associated_charts(charts_path):
 def upload_file_s3(s3_client, path, bucket_name, object_name):
     s3_client.upload_file(path, bucket_name, object_name)
 
-def push_charts_to_s3(packet, airac, charts_path):
+def push_charts_to_s3(airac, charts_path):
     logInfo('Pushing downloaded charts to S3')
     s3_config = Config(s3 = {"use_accelerate_endpoint": True}, max_pool_connections = UPLOAD_THREADS)
     s3_client = boto3.client('s3', config=s3_config)
@@ -109,6 +128,8 @@ def download_charts(packet, airac):
     return (zip_file_download_path, file_name)
 
 def insert_charts_to_dynamodb(airac, files_path):
+    data = ChartDataFormatter.process_data(airac, files_path)
+
     logInfo('Inserting charts to DynamoDB')
     logInfo('Finished inserting charts to DynamoDB')
 
@@ -118,9 +139,11 @@ def download_chart_supplement(airac):
 
 def lambda_handler(event, context):
     logInfo(f'Trigger received with event: {str(event)}')
-    attributes = event['Records'][0]['Sns']['MessageAttributes']
-    packet = attributes['packet']['Value']
-    airac = attributes['airac']['Value']
+    #attributes = event['Records'][0]['Sns']['MessageAttributes']
+    #packet = attributes['packet']['Value']
+    #airac = attributes['airac']['Value']
+    packet = 'E'
+    airac = '250417'
 
     logInfo(f'packet: {packet}, airac: {airac}')
 
@@ -129,10 +152,14 @@ def lambda_handler(event, context):
             zip_file_download_path, file_name = download_charts(packet, airac)
             charts_path = unzip_charts(zip_file_download_path, file_name)
             combine_associated_charts(charts_path)
-            push_charts_to_s3(packet, airac, charts_path)
+            push_charts_to_s3(airac, charts_path)
         case 'E':
             zip_file_download_path, file_name = download_charts(packet, airac)
-            insert_charts_dynamodb(airac, unzip_charts(zip_file_download_path, file_name))
+            charts_path = unzip_charts(zip_file_download_path, file_name)
+            insert_charts_to_dynamodb(airac, charts_path)
+            charts_path /= 'compare_pdf'
+            combine_associated_charts(charts_path)
+            push_charts_to_s3(airac, charts_path)
         case 'ChartSupplement':
             download_chart_supplement(airac)
         case _:
@@ -142,3 +169,4 @@ def lambda_handler(event, context):
     logInfo('Cleaning up drive')
     shutil.rmtree(DOWNLOAD_PATH)
     
+lambda_handler(None, None)
