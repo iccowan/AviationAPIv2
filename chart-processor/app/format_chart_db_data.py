@@ -5,7 +5,8 @@ import boto3
 
 from app.lib.logger import logInfo
 from app.lib.models.Airport import Airport
-from app.lib.models.Chart import Chart
+from app.lib.models.Chart import Chart, ChartType
+import app.lib.repositories.airport_repository as AirportRepository
 
 CHART_BASE_URL = os.environ.get("CHART_BASE_URL", "")
 START_EVENT = "start"
@@ -14,7 +15,7 @@ END_EVENT = "end"
 
 def update_current_airport_tags(current_airport, event, element, tag, text):
     if event == START_EVENT and tag == "state_code":
-        current_airport.airport_data.state = element.attrib["ID"]
+        current_airport.airport_data.state_abbr = element.attrib["ID"]
         current_airport.airport_data.state_full = element.attrib["state_fullname"]
     if event == START_EVENT and tag == "city_name":
         current_airport.airport_data.city = element.attrib["ID"]
@@ -43,25 +44,17 @@ def update_current_chart_tags(
     if event == END_EVENT and tag == "chart_code":
         match text:
             case "APD":
-                current_chart_data["current_chart_section"] = Airport.CHART_SECTIONS[
-                    "airport_diagram"
-                ]
+                current_chart_data["current_chart_section"] = (
+                    ChartType.AIRPORT_DIAGRAM.value
+                )
             case "DP" | "DAU":
-                current_chart_data["current_chart_section"] = Airport.CHART_SECTIONS[
-                    "departure"
-                ]
+                current_chart_data["current_chart_section"] = ChartType.DEPARTURE.value
             case "STAR":
-                current_chart_data["current_chart_section"] = Airport.CHART_SECTIONS[
-                    "arrival"
-                ]
+                current_chart_data["current_chart_section"] = ChartType.ARRIVAL.value
             case "IAP" | "CVFP":
-                current_chart_data["current_chart_section"] = Airport.CHART_SECTIONS[
-                    "approach"
-                ]
+                current_chart_data["current_chart_section"] = ChartType.APPROACH.value
             case _:
-                current_chart_data["current_chart_section"] = Airport.CHART_SECTIONS[
-                    "general"
-                ]
+                current_chart_data["current_chart_section"] = ChartType.GENERAL.value
 
 
 def insert_chart_to_airport(current_airport, current_chart, current_chart_data):
@@ -75,8 +68,8 @@ def insert_chart_to_airport(current_airport, current_chart, current_chart_data):
         )
 
     if not current_chart_data["skip_chart"]:
-        current_airport.insert_new_chart(
-            current_chart_data["current_chart_section"], current_chart
+        current_airport.charts[current_chart_data["current_chart_section"]].append(
+            current_chart
         )
 
 
@@ -91,7 +84,6 @@ def process_xml_db(xml_document, airac):
         "chart_change": False,
     }
 
-    dynamodb_client = boto3.client("dynamodb")
     for event, element in xml_document:
         tag = element.tag.strip()
         text = element.text.strip() if element.text is not None else ""
@@ -109,12 +101,10 @@ def process_xml_db(xml_document, airac):
             current_chart = Chart()
 
         if event == END_EVENT and tag == "airport_name":
-            current_airport.update_dynamodb(dynamodb_client)
+            AirportRepository.put_airport(current_airport)
 
             airports += 1
             current_airport.reset_for_next_airport()
-
-    dynamodb_client.close()
 
     return airports
 

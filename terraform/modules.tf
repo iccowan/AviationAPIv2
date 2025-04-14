@@ -1,6 +1,7 @@
 module "api" {
   source = "./api"
 
+  DOMAIN = var.DOMAIN
   ENV              = var.ENV
   SUBDOMAIN_APPEND = var.SUBDOMAIN_APPEND
 }

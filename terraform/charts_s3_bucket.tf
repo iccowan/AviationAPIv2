@@ -26,7 +26,7 @@ resource "aws_s3_bucket_policy" "aviationapi-charts" {
 }
 
 resource "aws_acm_certificate" "aviationapi-charts" {
-  domain_name       = "charts${var.SUBDOMAIN_APPEND}.aviationapi.com"
+  domain_name       = "charts${var.SUBDOMAIN_APPEND}.${var.DOMAIN}"
   validation_method = "DNS"
 
   lifecycle {
@@ -48,7 +48,7 @@ resource "aws_cloudfront_distribution" "aviationapi-charts" {
   is_ipv6_enabled = true
 
   aliases = [
-    "charts${var.SUBDOMAIN_APPEND}.aviationapi.com"
+    "charts${var.SUBDOMAIN_APPEND}.${var.DOMAIN}"
   ]
 
   default_cache_behavior {

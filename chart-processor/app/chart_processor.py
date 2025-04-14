@@ -20,12 +20,18 @@ UPLOAD_THREADS = int(os.environ.get("UPLOAD_THREADS", 2))
 
 
 def generate_file_name(packet, airac):
-    return "DDTPP" + packet + "_" + airac
+    if packet == "chart_supplement":
+        return f"DCS_20{airac}"
+
+    return f"DDTPP{packet}_{airac}"
 
 
-def generate_download_url(file_name):
-    return f"https://aeronav.faa.gov/upload_313-d/terminal/{file_name}.zip"
+def generate_download_url(file_name, packet):
+    chart_type = "terminal"
+    if packet == "chart_supplement":
+        chart_type = "supplements"
 
+    return f"https://aeronav.faa.gov/upload_313-d/{chart_type}/{file_name}.zip"
 
 def unzip_charts(download_path, file_name):
     charts_path = DOWNLOAD_PATH / file_name
@@ -131,6 +137,10 @@ def push_charts_to_s3(airac, charts_path):
 
     for root, dir, files in os.walk(charts_path):
         for file in files:
+            _, file_ext = os.path.splitext(file)
+            if file_ext != ".pdf":
+                continue
+
             s3t.upload(
                 os.path.join(root, file),
                 S3_BUCKET_NAME,
@@ -151,7 +161,7 @@ def download_charts(packet, airac):
     file_name = generate_file_name(packet, airac)
     zip_file_download_path = DOWNLOAD_PATH / f"{file_name}.zip"
     zip_file_download_path.write_bytes(
-        requests.get(generate_download_url(file_name)).content
+        requests.get(generate_download_url(file_name, packet)).content
     )
 
     return (zip_file_download_path, file_name)
@@ -169,24 +179,30 @@ def download_chart_supplement(airac):
     logInfo(f"airac: {airac}")
 
 
-def process_standard_chart_packets(packet, airac):
+def download_and_unzip_charts(packet, airac):
     zip_file_download_path, file_name = download_charts(packet, airac)
     charts_path = unzip_charts(zip_file_download_path, file_name)
+
+    return charts_path
+
+def process_standard_chart_packets(packet, airac):
+    download_and_unzip_charts(packet, airac)
     combine_associated_charts(charts_path)
     push_charts_to_s3(airac, charts_path)
 
 
 def process_chart_packet_with_db_and_changes(packet, airac):
-    zip_file_download_path, file_name = download_charts(packet, airac)
-    charts_path = unzip_charts(zip_file_download_path, file_name)
+    download_and_unzip_charts(packet, airac)
     insert_charts_to_dynamodb(airac, charts_path)
     charts_path /= "compare_pdf"
     combine_associated_charts(charts_path)
     push_charts_to_s3(airac, charts_path)
 
 
-def process_chart_supplement(airac):
-    download_chart_supplement(airac)
+def process_chart_supplement(packet, airac):
+    download_and_unzip_charts(packet, airac)
+    insert_cs_to_dynamodb(airac, charts_path)
+    push_charts_to_s3(airac, charts_path)
 
 
 def lambda_handler(event, context):
@@ -203,7 +219,7 @@ def lambda_handler(event, context):
         case "E":
             process_chart_packet_with_db_and_changes(packet, airac)
         case "ChartSupplement":
-            process_chart_supplement(airac)
+            process_chart_supplement(packet, airac)
         case _:
             logError("Invalid packet specified")
             return 1
