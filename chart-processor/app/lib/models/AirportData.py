@@ -30,18 +30,11 @@ class AirportData:
         return new
 
     def db_dict(self):
-        dict_rep = {
-            "city": self.city,
-            "state_abbr": self.state_abbr,
-            "state_full": self.state_full,
-            "country": self.country,
-            "faa_ident": self.faa_ident,
-            "airport_name": self.airport_name,
-            "is_military": self.is_military,
-        }
+        dict_rep = {}
 
-        if self.icao_ident != "":
-            dict_rep["icao_ident"] = self.icao_ident
+        for k, v in self.__dict__.items():
+            if v != "" and v is not None:
+                dict_rep[k] = v
 
         return dict_rep
 

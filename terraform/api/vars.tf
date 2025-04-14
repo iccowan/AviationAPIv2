@@ -12,4 +12,4 @@ variable "OUTPUT_PATH" {
 
 variable "DOMAIN" {}
 variable "ENV" {}
-variable "SUBDOMAIN_APPEND" {}
+variable "ENV_SUFFIX" {}

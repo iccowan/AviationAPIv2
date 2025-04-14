@@ -10,7 +10,7 @@ variable "ENV" {
   default = "sandbox"
 }
 
-variable "SUBDOMAIN_APPEND" {
+variable "ENV_SUFFIX" {
   default = "-sandbox"
 }
 

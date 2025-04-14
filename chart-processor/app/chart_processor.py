@@ -9,7 +9,9 @@ import requests
 from botocore.config import Config
 from pypdf import PdfReader, PdfWriter
 
+import app.airport_codes as AirportCodes
 import app.format_chart_db_data as ChartDataFormatter
+import app.format_cs_db_data as ChartSupplementDataFormatter
 from app.lib.logger import logInfo
 
 DOWNLOAD_PATH = (
@@ -17,21 +19,46 @@ DOWNLOAD_PATH = (
 )
 S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME", "aviationapi-charts")
 UPLOAD_THREADS = int(os.environ.get("UPLOAD_THREADS", 2))
+MONTHS = {
+    "01": "Jan",
+    "02": "Feb",
+    "03": "Mar",
+    "04": "Apr",
+    "05": "May",
+    "06": "Jun",
+    "07": "Jul",
+    "08": "Aug",
+    "09": "Sep",
+    "10": "Oct",
+    "11": "Nov",
+    "12": "Dec",
+}
 
 
 def generate_file_name(packet, airac):
-    if packet == "chart_supplement":
+    if packet == "ChartSupplement":
         return f"DCS_20{airac}"
+
+    if packet == "codes":
+        year = airac[0:2]
+        month = MONTHS[airac[2:4]]
+        day = airac[4:6]
+
+        return f"{day}_{month}_20{year}_APT_CSV"
 
     return f"DDTPP{packet}_{airac}"
 
 
 def generate_download_url(file_name, packet):
+    if packet == "codes":
+        return f"https://nfdc.faa.gov/webContent/28DaySub/extra/{file_name}.zip"
+
     chart_type = "terminal"
-    if packet == "chart_supplement":
+    if packet == "ChartSupplement":
         chart_type = "supplements"
 
     return f"https://aeronav.faa.gov/upload_313-d/{chart_type}/{file_name}.zip"
+
 
 def unzip_charts(download_path, file_name):
     charts_path = DOWNLOAD_PATH / file_name
@@ -138,13 +165,13 @@ def push_charts_to_s3(airac, charts_path):
     for root, dir, files in os.walk(charts_path):
         for file in files:
             _, file_ext = os.path.splitext(file)
-            if file_ext != ".pdf":
+            if file_ext.lower() != ".pdf":
                 continue
 
             s3t.upload(
                 os.path.join(root, file),
                 S3_BUCKET_NAME,
-                s3_object_name + file,
+                s3_object_name + file.lower(),
                 extra_args=metadata,
             )
 
@@ -160,11 +187,17 @@ def download_charts(packet, airac):
 
     file_name = generate_file_name(packet, airac)
     zip_file_download_path = DOWNLOAD_PATH / f"{file_name}.zip"
+    response = requests.get(generate_download_url(file_name, packet))
     zip_file_download_path.write_bytes(
-        requests.get(generate_download_url(file_name, packet)).content
+        response.content
     )
 
-    return (zip_file_download_path, file_name)
+    should_continue = True
+    if packet == "ChartSupplement" and response.status_code != 200:
+        should_continue = False
+        logInfo("28 day cycle only, no chart supplement files to update")
+
+    return (zip_file_download_path, file_name, should_continue)
 
 
 def insert_charts_to_dynamodb(airac, files_path):
@@ -180,29 +213,41 @@ def download_chart_supplement(airac):
 
 
 def download_and_unzip_charts(packet, airac):
-    zip_file_download_path, file_name = download_charts(packet, airac)
-    charts_path = unzip_charts(zip_file_download_path, file_name)
+    zip_file_download_path, file_name, should_continue = download_charts(packet, airac)
+    charts_path = ""
+    if should_continue:
+        charts_path = unzip_charts(zip_file_download_path, file_name)
 
-    return charts_path
+    return (charts_path, should_continue)
+
 
 def process_standard_chart_packets(packet, airac):
-    download_and_unzip_charts(packet, airac)
+    charts_path, _ = download_and_unzip_charts(packet, airac)
     combine_associated_charts(charts_path)
     push_charts_to_s3(airac, charts_path)
 
 
 def process_chart_packet_with_db_and_changes(packet, airac):
-    download_and_unzip_charts(packet, airac)
+    charts_path, _ = download_and_unzip_charts(packet, airac)
     insert_charts_to_dynamodb(airac, charts_path)
     charts_path /= "compare_pdf"
     combine_associated_charts(charts_path)
     push_charts_to_s3(airac, charts_path)
 
 
+def process_airport_codes(airac):
+    path, _ = download_and_unzip_charts("codes", airac)
+    return AirportCodes.process_airport_codes(path)
+
+
 def process_chart_supplement(packet, airac):
-    download_and_unzip_charts(packet, airac)
-    insert_cs_to_dynamodb(airac, charts_path)
-    push_charts_to_s3(airac, charts_path)
+    airport_codes = process_airport_codes(airac)
+    charts_path, should_continue = download_and_unzip_charts(packet, airac)
+    if should_continue:
+        ChartSupplementDataFormatter.insert_cs_to_dynamodb(
+            airac, charts_path, airport_codes, MONTHS
+        )
+        push_charts_to_s3(airac, charts_path)
 
 
 def lambda_handler(event, context):

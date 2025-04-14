@@ -44,7 +44,7 @@ resource "aws_api_gateway_stage" "deployment" {
 }
 
 resource "aws_acm_certificate" "aviationapi" {
-  domain_name       = "api${var.SUBDOMAIN_APPEND}.${var.DOMAIN}"
+  domain_name       = "api${var.ENV_SUFFIX}.${var.DOMAIN}"
   validation_method = "DNS"
 
   lifecycle {
@@ -62,7 +62,7 @@ resource "aws_api_gateway_domain_name" "aviationapi" {
   ]
 
   certificate_arn = aws_acm_certificate_validation.aviationapi.certificate_arn
-  domain_name     = "api${var.SUBDOMAIN_APPEND}.${var.DOMAIN}"
+  domain_name     = "api${var.ENV_SUFFIX}.${var.DOMAIN}"
 }
 
 resource "aws_api_gateway_base_path_mapping" "aviationapi" {

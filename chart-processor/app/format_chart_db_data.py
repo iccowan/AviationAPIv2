@@ -1,12 +1,10 @@
 import os
 import xml.etree.ElementTree as ElementTree
 
-import boto3
-
+import app.lib.repositories.airport_repository as AirportRepository
 from app.lib.logger import logInfo
 from app.lib.models.Airport import Airport
 from app.lib.models.Chart import Chart, ChartType
-import app.lib.repositories.airport_repository as AirportRepository
 
 CHART_BASE_URL = os.environ.get("CHART_BASE_URL", "")
 START_EVENT = "start"
@@ -37,8 +35,8 @@ def update_current_chart_tags(
         if "_C" in text or "DELETED_JOB.PDF" in text or "DEL_APT_SERVED.PDF" in text:
             current_chart_data["skip_chart"] = True
 
-        current_chart.pdf_name = text
-        current_chart.pdf_url = f"{CHART_BASE_URL}/{airac}/{text}"
+        current_chart.pdf_name = text.lower()
+        current_chart.pdf_url = f"{CHART_BASE_URL}/{airac}/{text.lower()}"
     if event == END_EVENT and tag == "cn_flg":
         current_chart_data["chart_change"] = text == "Y"
     if event == END_EVENT and tag == "chart_code":

@@ -1,9 +1,9 @@
 module "api" {
   source = "./api"
 
-  DOMAIN = var.DOMAIN
-  ENV              = var.ENV
-  SUBDOMAIN_APPEND = var.SUBDOMAIN_APPEND
+  DOMAIN     = var.DOMAIN
+  ENV        = var.ENV
+  ENV_SUFFIX = var.ENV_SUFFIX
 }
 
 module "db" {
@@ -13,8 +13,8 @@ module "db" {
 module "chart-processing" {
   source = "./chart-processing"
 
-  S3_BUCKET = aws_s3_bucket.aviationapi-charts
+  S3_BUCKET          = aws_s3_bucket.aviationapi-charts
   AIRPORTS_TABLE_ARN = module.db.aviationapi-airports-table-arn
-  AIRAC_TABLE_ARN = module.db.aviationapi-airac-table-arn
-  CHARTS_BASE_URL = "https://${tolist(aws_cloudfront_distribution.aviationapi-charts.aliases)[0]}"
+  AIRAC_TABLE_ARN    = module.db.aviationapi-airac-table-arn
+  CHARTS_BASE_URL    = "https://${tolist(aws_cloudfront_distribution.aviationapi-charts.aliases)[0]}"
 }

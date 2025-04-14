@@ -18,7 +18,14 @@ def generate_key(airport):
     if len(id) == 0:
         id = airport.airport_data.faa_ident
 
-    return {"unique_airport_id": id, "chart_type::airac": f"tpp::{airport.airac}"}
+    entry_type = "tpp"
+    if type(airport).__name__ == "AirportChartSupplement":
+        entry_type = "cs"
+
+    return {
+        "unique_airport_id": id,
+        "chart_type::airac": f"{entry_type}::{airport.airac}",
+    }
 
 
 def put_airport(airport):

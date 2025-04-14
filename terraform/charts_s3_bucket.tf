@@ -1,10 +1,34 @@
 resource "aws_s3_bucket" "aviationapi-charts" {
-  bucket = "aviationapi-charts"
+  bucket = "aviationapi${var.ENV_SUFFIX}"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "aviationapi-charts" {
+  bucket = aws_s3_bucket.aviationapi-charts.id
+
+  rule {
+    id     = "delete-after-90-days"
+    status = "Enabled"
+
+    filter {}
+
+    expiration {
+      days = 90
+    }
+  }
 }
 
 resource "aws_s3_bucket_accelerate_configuration" "aviationapi-charts" {
   bucket = aws_s3_bucket.aviationapi-charts.id
   status = "Enabled"
+}
+
+resource "aws_s3_bucket_public_access_block" "aviationapi-charts" {
+  bucket = aws_s3_bucket.aviationapi-charts.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }
 
 resource "aws_s3_bucket_policy" "aviationapi-charts" {
@@ -23,10 +47,14 @@ resource "aws_s3_bucket_policy" "aviationapi-charts" {
       }
     ]
   })
+
+  depends_on = [
+    aws_s3_bucket_public_access_block.aviationapi-charts
+  ]
 }
 
 resource "aws_acm_certificate" "aviationapi-charts" {
-  domain_name       = "charts${var.SUBDOMAIN_APPEND}.${var.DOMAIN}"
+  domain_name       = "charts${var.ENV_SUFFIX}.${var.DOMAIN}"
   validation_method = "DNS"
 
   lifecycle {
@@ -48,7 +76,7 @@ resource "aws_cloudfront_distribution" "aviationapi-charts" {
   is_ipv6_enabled = true
 
   aliases = [
-    "charts${var.SUBDOMAIN_APPEND}.${var.DOMAIN}"
+    "charts${var.ENV_SUFFIX}.${var.DOMAIN}"
   ]
 
   default_cache_behavior {
@@ -77,4 +105,8 @@ resource "aws_cloudfront_distribution" "aviationapi-charts" {
     acm_certificate_arn = aws_acm_certificate.aviationapi-charts.arn
     ssl_support_method  = "sni-only"
   }
+
+  depends_on = [
+    aws_acm_certificate.aviationapi-charts
+  ]
 }
