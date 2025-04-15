@@ -3,11 +3,11 @@ variable "PY_VERSION" {
 }
 
 variable "SOURCE_DIR" {
-  default = "../api/build"
+  default = "../src/api/build"
 }
 
 variable "OUTPUT_PATH" {
-  default = "../api/build.zip"
+  default = "../src/api/build.zip"
 }
 
 variable "DOMAIN" {}

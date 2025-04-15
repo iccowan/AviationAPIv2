@@ -3,11 +3,11 @@ variable "PY_VERSION" {
 }
 
 variable "SOURCE_DIR" {
-  default = "../chart-processor/build"
+  default = "../src/chart-processor/build"
 }
 
 variable "OUTPUT_PATH" {
-  default = "../chart-processor/build.zip"
+  default = "../src/chart-processor/build.zip"
 }
 
 variable "S3_BUCKET" {}
