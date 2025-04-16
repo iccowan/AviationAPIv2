@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import app.lib.repositories.airac_data_repository as AiracDataRepository
+import app.lib.messengers.trigger_chart_processor as TriggerChartProcessorMessenger
 from app.lib.models.AiracData import AiracData, CycleChartTypes, CycleTypes
 
 AIRAC_DATE_FORMAT = "%y%m%d"
@@ -98,17 +99,37 @@ def get_current_airacs():
         "next_supplement_airac": next_supplement_airac
     }
 
+def update_airac(current_airacs, chart_type):
+    current_key = "current_charts_airac"
+    next_key = "next_charts_airac"
+    cycle_days = 28
+
+    if chart_type == CycleChartTypes.CHART_SUPPLEMENT.value:
+        current_key = "current_supplement_airac"
+        next_key = "next_supplement_airac"
+        cycle_days = 56
+
+    if current_airacs[next_key].valid_date <= TODAY and current_airacs[next_key].is_retrieveable:
+        AiracDataRepository.delete_airac(current_airacs[current_key])
+
+        current_airacs[current_key] = current_airacs[next_key]
+        current_airacs[current_key].cycle_type = CycleTypes.CURRENT.value
+        next_valid_date = current_airacs[current_key].valid_date + timedelta(days=cycle_days)
+
+        current_airacs[next_key] = AiracData(date_to_airac(next_valid_date), CycleTypes.NEXT.value, chart_type, next_valid_date)
+
+        AiracDataRepository.put_airac(current_airacs[current_key])
+        AiracDataRepository.put_airac(current_airacs[next_key])
+
+
 def update_airacs(current_airacs):
-    if current_airacs["next_charts_airac"].valid_date >= TODAY:
-        AiracDataRepository.delete_airac(current_airacs["current_charts_airac"])
+    update_airac(current_airacs, CycleChartTypes.CHARTS.value)
+    update_airac(current_airacs, CycleChartTypes.CHART_SUPPLEMENT.value)
 
-        current_airacs["current_charts_airac"] = current_airacs["next_charrts_airac"]
-        current_airacs["current_charts_airac"].cycle_type = CycleTypes.CURRENT.value
-        next_airac_string = current_airacs["current_charts_airac"].valid_date + timedelta(days=28)
-
-        current_airacs["next_charts_airac"] = AiracData(next_airac_string, CycleTypes.NEXT.value, CycleChartTypes.CHARTS.value, airac_to_date(next_airac_string))
-
-        AiracDataRepository.put_airac(current_airacs["next_charts_airac"])
+def trigger_airac_updates(current_airacs):
+    for _, airac_data in current_airacs.items():
+        if TODAY + timedelta(days=14) >= airac_data.valid_date and not airac_data.is_retrieveable:
+            TriggerChartProcessorMessenger.publish_update_messages_for_airac(airac_data)
 
 
 def lambda_handler(event, context):

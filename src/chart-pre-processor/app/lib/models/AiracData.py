@@ -31,7 +31,6 @@ class AiracData:
         cycle_chart_type=CycleChartTypes.CHARTS.value,
         valid_date=None,
         is_retrieveable=False,
-        is_packet_processed={packet.value: False for packet in list(Packets)},
         airac_data_dict={},
     ):
         self.airac = airac
@@ -39,7 +38,17 @@ class AiracData:
         self.cycle_chart_type = cycle_chart_type
         self.valid_date = valid_date
         self.is_retrieveable = is_retrieveable
-        self.is_packet_processed = is_packet_processed
+
+        self.is_packet_processed = {
+            Packets.A.value: False,
+            Packets.B.value: False,
+            Packets.C.value: False,
+            Packets.D.value: False,
+            Packets.E.value: False
+        }
+
+        if cycle_chart_type == CycleChartTypes.CHART_SUPPLEMENT.value:
+            self.is_packet_processed = {Packets.CHART_SUPPLEMENT.value: False}
 
         for k, v in airac_data_dict.items():
             if k == "valid_date":
@@ -48,13 +57,13 @@ class AiracData:
             self.__dict__[k] = v
 
     def date_str_to_datetime(date_str):
-        return datetime.strptime(date_str, self.VALID_DATE_FORMAT)
+        return datetime.strptime(date_str, AiracData.VALID_DATE_FORMAT)
 
     def valid_date_to_str(self):
         return self.valid_date.strftime(AiracData.VALID_DATE_FORMAT)
 
     def db_dict(self):
-        self_dict = self.__dict__
+        self_dict = self.__dict__.copy()
         self_dict["valid_date"] = self.valid_date_to_str()
 
         return self_dict
