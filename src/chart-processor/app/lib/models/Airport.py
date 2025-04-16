@@ -6,8 +6,6 @@ from app.lib.models.Chart import ChartType
 
 
 class Airport:
-    TABLE_NAME = "aviationapi-airports"
-
     def __init__(self, airac):
         self.airac = airac
         self.airport_data = AirportData()

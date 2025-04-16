@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import boto3
+import os
 from boto3.dynamodb.conditions import Attr
 from botocore.exceptions import ClientError
 
@@ -8,7 +9,7 @@ from app.lib.logger import logError
 from app.lib.models.Airport import Airport
 from app.lib.models.Chart import Chart
 
-TABLE_NAME = "aviationapi-airports"
+TABLE_NAME = os.environ.get("AIRPORTS_DB_NAME", "aviationapi-airports")
 TABLE = boto3.resource("dynamodb").Table(TABLE_NAME)
 EXPIRATION_TIMESTAMP = int((datetime.now() + timedelta(days=120)).timestamp())
 

@@ -1,7 +1,7 @@
-output "aviationapi-airports-table-arn" {
-  value = aws_dynamodb_table.aviationapi-airports-table.arn
+output "aviationapi-airports-table" {
+  value = aws_dynamodb_table.aviationapi-airports-table
 }
 
-output "aviationapi-airac-table-arn" {
-  value = aws_dynamodb_table.aviationapi-airac-table.arn
+output "aviationapi-airac-table" {
+  value = aws_dynamodb_table.aviationapi-airac-table
 }

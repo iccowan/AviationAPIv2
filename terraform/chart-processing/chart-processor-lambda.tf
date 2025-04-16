@@ -27,6 +27,7 @@ resource "aws_lambda_function" "aviationapi_chart_processor_lambda" {
       S3_BUCKET_NAME = var.S3_BUCKET.bucket
       UPLOAD_THREADS = 100
       CHART_BASE_URL = var.CHARTS_BASE_URL
+      AIRPORTS_DB_NAME = var.AIRPORTS_TABLE.name
     }
   }
 
@@ -72,7 +73,7 @@ resource "aws_iam_role_policy" "lambda_chart_processor_role" {
           "dynamodb:PutItem"
         ],
         Resource = [
-          var.AIRPORTS_TABLE_ARN
+          var.AIRPORTS_TABLE.arn
         ]
       }
     ]

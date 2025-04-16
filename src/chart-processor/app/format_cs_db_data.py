@@ -23,7 +23,10 @@ def update_current_tags(
 
     if event == END_EVENT and tag == "pdf":
         current_airport.charts.append(
-            {"pdf_name": text.lower(), "pdf_url": f"{CHART_BASE_URL}/{airac}/{text.lower()}"}
+            {
+                "pdf_name": text.lower(),
+                "pdf_url": f"{CHART_BASE_URL}/{airac}/{text.lower()}",
+            }
         )
 
 
@@ -38,7 +41,14 @@ def process_xml_db(xml_document, airac, airport_codes):
         text = element.text.strip() if element.text is not None else ""
 
         update_current_tags(
-            current_airport, airport_data, airport_codes, airac, event, element, tag, text
+            current_airport,
+            airport_data,
+            airport_codes,
+            airac,
+            event,
+            element,
+            tag,
+            text,
         )
 
         if event == END_EVENT and tag == "airport":

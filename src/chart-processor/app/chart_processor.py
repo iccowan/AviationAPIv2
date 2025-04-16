@@ -188,9 +188,7 @@ def download_charts(packet, airac):
     file_name = generate_file_name(packet, airac)
     zip_file_download_path = DOWNLOAD_PATH / f"{file_name}.zip"
     response = requests.get(generate_download_url(file_name, packet))
-    zip_file_download_path.write_bytes(
-        response.content
-    )
+    zip_file_download_path.write_bytes(response.content)
 
     should_continue = True
     if packet == "ChartSupplement" and response.status_code != 200:
