@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "aviationapi-charts" {
   bucket = "aviationapi${var.ENV_SUFFIX}"
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "aviationapi-charts" {
+resource "aws_s3_bucket_lifecycle_configuration" "aviationapi-charts-lifecycle" {
   bucket = aws_s3_bucket.aviationapi-charts.id
 
   rule {
@@ -17,12 +17,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "aviationapi-charts" {
   }
 }
 
-resource "aws_s3_bucket_accelerate_configuration" "aviationapi-charts" {
+resource "aws_s3_bucket_accelerate_configuration" "aviationapi-charts-accelerate" {
   bucket = aws_s3_bucket.aviationapi-charts.id
   status = "Enabled"
 }
 
-resource "aws_s3_bucket_public_access_block" "aviationapi-charts" {
+resource "aws_s3_bucket_public_access_block" "aviationapi-charts-public-access" {
   bucket = aws_s3_bucket.aviationapi-charts.id
 
   block_public_acls       = false
@@ -31,7 +31,7 @@ resource "aws_s3_bucket_public_access_block" "aviationapi-charts" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_policy" "aviationapi-charts" {
+resource "aws_s3_bucket_policy" "aviationapi-charts-policy" {
   bucket = aws_s3_bucket.aviationapi-charts.id
 
   policy = jsonencode({
@@ -49,11 +49,11 @@ resource "aws_s3_bucket_policy" "aviationapi-charts" {
   })
 
   depends_on = [
-    aws_s3_bucket_public_access_block.aviationapi-charts
+    aws_s3_bucket_public_access_block.aviationapi-charts-public-access
   ]
 }
 
-resource "aws_acm_certificate" "aviationapi-charts" {
+resource "aws_acm_certificate" "aviationapi-charts-cert" {
   domain_name       = "charts${var.ENV_SUFFIX}.${var.DOMAIN}"
   validation_method = "DNS"
 
@@ -66,7 +66,7 @@ locals {
   s3_origin_id = "${aws_s3_bucket.aviationapi-charts.bucket}-origin"
 }
 
-resource "aws_cloudfront_distribution" "aviationapi-charts" {
+resource "aws_cloudfront_distribution" "aviationapi-charts-cloudfront" {
   origin {
     domain_name = aws_s3_bucket.aviationapi-charts.bucket_regional_domain_name
     origin_id   = local.s3_origin_id
@@ -102,11 +102,7 @@ resource "aws_cloudfront_distribution" "aviationapi-charts" {
   }
 
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate.aviationapi-charts.arn
+    acm_certificate_arn = aws_acm_certificate.aviationapi-charts-cert.arn
     ssl_support_method  = "sni-only"
   }
-
-  depends_on = [
-    aws_acm_certificate.aviationapi-charts
-  ]
 }

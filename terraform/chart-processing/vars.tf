@@ -13,3 +13,4 @@ variable "OUTPUT_PATH" {
 variable "S3_BUCKET" {}
 variable "AIRPORTS_TABLE" {}
 variable "CHARTS_BASE_URL" {}
+variable "TRIGGER_CHART_POST_PROCESSOR_TOPIC" {}

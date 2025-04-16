@@ -1,5 +1,5 @@
-from enum import Enum
 from datetime import datetime
+from enum import Enum
 
 
 class Packets(Enum):
@@ -44,7 +44,7 @@ class AiracData:
             Packets.B.value: False,
             Packets.C.value: False,
             Packets.D.value: False,
-            Packets.E.value: False
+            Packets.E.value: False,
         }
 
         if cycle_chart_type == CycleChartTypes.CHART_SUPPLEMENT.value:

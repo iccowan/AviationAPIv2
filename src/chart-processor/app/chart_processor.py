@@ -12,6 +12,7 @@ from pypdf import PdfReader, PdfWriter
 import app.airport_codes as AirportCodes
 import app.format_chart_db_data as ChartDataFormatter
 import app.format_cs_db_data as ChartSupplementDataFormatter
+import app.lib.messengers.trigger_chart_post_processor as TriggerChartPostProcessorMessenger
 from app.lib.logger import logInfo
 
 DOWNLOAD_PATH = (
@@ -266,6 +267,9 @@ def lambda_handler(event, context):
         case _:
             logError("Invalid packet specified")
             return 1
+
+    logInfo(f"Sending success message to post processor for packet {packet} airac {airac}")
+    TriggerChartPostProcessorMessenger.publish_success_message(airac, packet)
 
     logInfo("Cleaning up drive")
     shutil.rmtree(DOWNLOAD_PATH)
