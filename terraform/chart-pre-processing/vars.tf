@@ -3,11 +3,11 @@ variable "PY_VERSION" {
 }
 
 variable "SOURCE_DIR" {
-  default = "../src/chart-pre-processor/build"
+  default = "../src/aviationapi/chart_pre_processor/build"
 }
 
 variable "OUTPUT_PATH" {
-  default = "../src/chart-pre-processor/build.zip"
+  default = "../src/aviationapi/chart_pre_processor/build.zip"
 }
 
 variable "TRIGGER_CHART_PROCESSOR_TOPIC" {}

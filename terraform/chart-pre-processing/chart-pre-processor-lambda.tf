@@ -12,7 +12,7 @@ resource "aws_lambda_function" "aviationapi-chart-pre-processor-lambda" {
   timeout     = 10
 
   filename         = var.OUTPUT_PATH
-  handler          = "app.chart_pre_processor.lambda_handler"
+  handler          = "aviationapi.chart_pre_processing.app.chart_pre_processor.lambda_handler"
   source_code_hash = data.archive_file.lambda-archive.output_base64sha256
 
   role = aws_iam_role.chart-pre-processor-lambda-role.arn
