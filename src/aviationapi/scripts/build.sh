@@ -14,7 +14,6 @@ MODULE_PATH=$PROJECT_PATH/$MODULE
 
 if [ -d "$MODULE_PATH/build" ]; then rm -rf $MODULE_PATH/build; fi
 if [ -f "$MODULE_PATH/build.zip" ]; then rm -f $MODULE_PATH/build.zip; fi
-echo $MODULE_PATH
 
 mkdir $MODULE_PATH/build
 mkdir $MODULE_PATH/build/aviationapi

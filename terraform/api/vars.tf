@@ -3,11 +3,11 @@ variable "PY_VERSION" {
 }
 
 variable "SOURCE_DIR" {
-  default = "../src/api/build"
+  default = "../src/aviationapi/api/build"
 }
 
 variable "OUTPUT_PATH" {
-  default = "../src/api/build.zip"
+  default = "../src/aviationapi/api/build.zip"
 }
 
 variable "DOMAIN" {}

@@ -12,13 +12,13 @@ resource "aws_lambda_function" "aviationapi-chart-pre-processor-lambda" {
   timeout     = 10
 
   filename         = var.OUTPUT_PATH
-  handler          = "aviationapi.chart_pre_processing.app.chart_pre_processor.lambda_handler"
+  handler          = "aviationapi.chart_pre_processor.app.lambda_function.lambda_handler"
   source_code_hash = data.archive_file.lambda-archive.output_base64sha256
 
   role = aws_iam_role.chart-pre-processor-lambda-role.arn
 
   environment {
-    variables {
+    variables = {
       TRIGGER_CHART_PROCESSOR_TOPIC_ARN = var.TRIGGER_CHART_PROCESSOR_TOPIC.arn
     }
   }
@@ -28,7 +28,7 @@ resource "aws_lambda_function" "aviationapi-chart-pre-processor-lambda" {
   }
 }
 
-resource "aws_iam_role" "chart-pre_processor-lambda-role" {
+resource "aws_iam_role" "chart-pre-processor-lambda-role" {
   name = "chart-pre-processor-lambda-role"
 
   assume_role_policy = jsonencode({
@@ -62,6 +62,16 @@ resource "aws_iam_role_policy" "lambda-chart-pre-processor-role" {
         ],
         Resource = [
           var.AIRAC_TABLE.arn
+        ]
+      },
+      {
+        Sid = "PublishMessage",
+        Effect = "Allow",
+        Action = [
+          "sns:Publish"
+        ],
+        Resource = [
+          var.TRIGGER_CHART_PROCESSOR_TOPIC.arn
         ]
       }
     ]

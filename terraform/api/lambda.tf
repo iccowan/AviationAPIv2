@@ -41,7 +41,7 @@ resource "aws_iam_role" "aviationapi-api-lambda-role" {
 
 resource "aws_iam_role_policy_attachment" "aviationapi-api-lambda" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.aviapionapi-api-lambda-role.name
+  role       = aws_iam_role.aviationapi-api-lambda-role.name
 }
 
 resource "aws_lambda_permission" "aviationapi-api-with-apigateway" {
@@ -50,5 +50,5 @@ resource "aws_lambda_permission" "aviationapi-api-with-apigateway" {
   function_name = aws_lambda_function.aviationapi-api-lambda.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_api_gateway_rest_api.aviationapi.execution_arn}/*/*"
+  source_arn = "${aws_api_gateway_rest_api.aviationapi-api-apigateway.execution_arn}/*/*"
 }

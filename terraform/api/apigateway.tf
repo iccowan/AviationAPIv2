@@ -19,7 +19,7 @@ resource "aws_api_gateway_method" "aviationapi-api-proxy" {
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_integration" "aviapionapi-api-lambda-integration" {
+resource "aws_api_gateway_integration" "aviationapi-api-lambda-integration" {
   rest_api_id             = aws_api_gateway_rest_api.aviationapi-api-apigateway.id
   resource_id             = aws_api_gateway_resource.aviationapi-api-root.id
   http_method             = aws_api_gateway_method.aviationapi-api-proxy.http_method

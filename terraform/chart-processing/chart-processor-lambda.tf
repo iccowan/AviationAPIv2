@@ -12,7 +12,7 @@ resource "aws_lambda_function" "aviationapi-chart-processor-lambda" {
   timeout     = 360
 
   filename         = var.OUTPUT_PATH
-  handler          = "aviationapi.chart_processor.app.chart_processor.lambda_handler"
+  handler          = "aviationapi.chart_processor.app.lambda_function.lambda_handler"
   source_code_hash = data.archive_file.lambda-archive.output_base64sha256
 
   role = aws_iam_role.chart-processor-lambda-role.arn
@@ -75,6 +75,16 @@ resource "aws_iam_role_policy" "lambda-chart-processor-role" {
         ],
         Resource = [
           var.AIRPORTS_TABLE.arn
+        ]
+      },
+      {
+        Sid = "PublishMessage",
+        Effect = "Allow",
+        Action = [
+          "sns:Publish"
+        ],
+        Resource = [
+          var.TRIGGER_CHART_POST_PROCESSOR_TOPIC.arn
         ]
       }
     ]

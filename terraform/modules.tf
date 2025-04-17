@@ -10,6 +10,13 @@ module "db" {
   source = "./db"
 }
 
+module "chart-pre-processing" {
+  source = "./chart-pre-processing"
+
+  TRIGGER_CHART_PROCESSOR_TOPIC = module.chart-processing.trigger-chart-processor-topic
+  AIRAC_TABLE = module.db.aviationapi-airac-table
+}
+
 module "chart-processing" {
   source = "./chart-processing"
 
@@ -19,9 +26,6 @@ module "chart-processing" {
   TRIGGER_CHART_POST_PROCESSOR_TOPIC = module.chart-post-processing.trigger-chart-post-processor-topic
 }
 
-module "chart-pre-processing" {
-  source = "./chart-pre-processing"
-
-  TRIGGER_CHART_PROCESSOR_TOPIC = module.chart-processing.trigger-chart-processor-topic
-  AIRAC_TABLE = module.db.aviationapi-airac-table
+module "chart-post-processing" {
+  source = "./chart-post-processing"
 }
