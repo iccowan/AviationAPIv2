@@ -1,7 +1,11 @@
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
 
+
 def get_airac_data(airac, cycle_chart_type):
-    return AiracDataRepository.get_airac_by_cycle_chart_type_and_airac(airac, cycle_chart_type)
+    return AiracDataRepository.get_airac_by_cycle_chart_type_and_airac(
+        airac, cycle_chart_type
+    )
+
 
 def update_airac_data(airac_data, packet):
     airac_data.airac_data_dict[packet] = True
@@ -14,6 +18,7 @@ def update_airac_data(airac_data, packet):
 
     AiracDataRepository.put_airac(airac_data)
 
+
 def lambda_handler(event, context):
     logInfo(f"Trigger received with event: {str(event)}")
     attributes = event["Records"][0]["Sns"]["MessageAttributes"]
@@ -23,8 +28,7 @@ def lambda_handler(event, context):
 
     airac_data = get_airac_data(airac, cycle_chart_type)
     if airac_data is None:
-        logError(f"No {cycle_chart_type} airac data found for airac {airac}"
+        logError(f"No {cycle_chart_type} airac data found for airac {airac}")
         return 1
 
     update_airac_data(airac_data, packet)
-

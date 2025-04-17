@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from .routers import charts, airports
+
+from .routers import airports, charts
 
 app = FastAPI()
 

@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 
 import aviationapi.lib.messengers.trigger_chart_processor as TriggerChartProcessorMessenger
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
-from aviationapi.lib.models.AiracData import AiracData, CycleChartTypes, CycleTypes
 from aviationapi.lib.logger import logInfo
+from aviationapi.lib.models.AiracData import AiracData, CycleChartTypes, CycleTypes
 
 AIRAC_DATE_FORMAT = "%y%m%d"
 TODAY = datetime.today()

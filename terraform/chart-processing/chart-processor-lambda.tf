@@ -23,11 +23,11 @@ resource "aws_lambda_function" "aviationapi-chart-processor-lambda" {
 
   environment {
     variables = {
-      DOWNLOAD_PATH    = "/tmp"
-      S3_BUCKET_NAME   = var.S3_BUCKET.bucket
-      UPLOAD_THREADS   = 100
-      CHART_BASE_URL   = var.CHARTS_BASE_URL
-      AIRPORTS_DB_NAME = var.AIRPORTS_TABLE.name
+      DOWNLOAD_PATH                          = "/tmp"
+      S3_BUCKET_NAME                         = var.S3_BUCKET.bucket
+      UPLOAD_THREADS                         = 100
+      CHART_BASE_URL                         = var.CHARTS_BASE_URL
+      AIRPORTS_DB_NAME                       = var.AIRPORTS_TABLE.name
       TRIGGER_CHART_POST_PROCESSOR_TOPIC_ARN = var.TRIGGER_CHART_POST_PROCESSOR_TOPIC.arn
     }
   }
@@ -78,7 +78,7 @@ resource "aws_iam_role_policy" "lambda-chart-processor-role" {
         ]
       },
       {
-        Sid = "PublishMessage",
+        Sid    = "PublishMessage",
         Effect = "Allow",
         Action = [
           "sns:Publish"

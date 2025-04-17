@@ -65,7 +65,7 @@ resource "aws_iam_role_policy" "lambda-chart-pre-processor-role" {
         ]
       },
       {
-        Sid = "PublishMessage",
+        Sid    = "PublishMessage",
         Effect = "Allow",
         Action = [
           "sns:Publish"

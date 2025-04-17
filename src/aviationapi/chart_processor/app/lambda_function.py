@@ -13,8 +13,8 @@ import aviationapi.chart_processor.app.airport_codes as AirportCodes
 import aviationapi.chart_processor.app.format_chart_db_data as ChartDataFormatter
 import aviationapi.chart_processor.app.format_cs_db_data as ChartSupplementDataFormatter
 import aviationapi.lib.messengers.trigger_chart_post_processor as TriggerChartPostProcessorMessenger
-from aviationapi.lib.models.AiracData import CycleChartTypes
 from aviationapi.lib.logger import logInfo
+from aviationapi.lib.models.AiracData import CycleChartTypes
 
 DOWNLOAD_PATH = (
     pathlib.Path(os.environ.get("DOWNLOAD_PATH", os.getcwd() + "/temp")) / "data"
@@ -271,8 +271,12 @@ def lambda_handler(event, context):
             logError("Invalid packet specified")
             return 1
 
-    logInfo(f"Sending success message to post processor for {cycle_chart_type} packet {packet} airac {airac}")
-    TriggerChartPostProcessorMessenger.publish_success_message(airac, packet, cycle_chart_type)
+    logInfo(
+        f"Sending success message to post processor for {cycle_chart_type} packet {packet} airac {airac}"
+    )
+    TriggerChartPostProcessorMessenger.publish_success_message(
+        airac, packet, cycle_chart_type
+    )
 
     logInfo("Cleaning up drive")
     shutil.rmtree(DOWNLOAD_PATH)

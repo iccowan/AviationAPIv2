@@ -4,11 +4,10 @@ import random
 from importlib import reload
 from unittest.mock import patch
 
-from pytest import MonkeyPatch, fixture
-
 import app
 import app.chart_processor
 from app.chart_processor import lambda_handler, process_standard_chart_packets
+from pytest import MonkeyPatch, fixture
 
 
 @patch("app.chart_processor.process_standard_chart_packets")

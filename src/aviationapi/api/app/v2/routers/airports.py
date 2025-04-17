@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 
-router = APIRouter(
-    prefix = '/airports'
-)
+router = APIRouter(prefix="/airports")
 
-@router.get('')
+
+@router.get("")
 async def airports():
-    return ['KATL', 'KCLT', 'KLUK']
+    return ["KATL", "KCLT", "KLUK"]
 
-@router.get('/exists')
+
+@router.get("/exists")
 async def airport_exists(airport: str):
-    return airport == 'KATL'
+    return airport == "KATL"

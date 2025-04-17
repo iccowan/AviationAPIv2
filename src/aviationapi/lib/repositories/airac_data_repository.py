@@ -16,6 +16,7 @@ def get_airac(cycle_type="next", cycle_chart_type="charts"):
 
     return AiracData(airac_data_dict=airac_dict)
 
+
 def get_airac_by_cycle_chart_type_and_airac(airac, cycle_chart_type):
     airac_dict = _get({"airac": airac, "cycle_chart_type": cycle_chart_type})
 

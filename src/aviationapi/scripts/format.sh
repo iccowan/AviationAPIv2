@@ -3,7 +3,7 @@
 ABS_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd $ABS_PATH/..
 
-DIRS="app tests"
+DIRS="."
 CHECK_ONLY=0
 EXIT_CODE=0
 
