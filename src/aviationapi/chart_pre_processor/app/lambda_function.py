@@ -21,7 +21,7 @@ def date_to_airac(date_time):
 def deduce_current_next_airac():
     current_charts_airac = None
     next_charts_airac = airac_to_date(BASE_AIRAC_WITH_CS)
-    next_airac_has_cs = False
+    next_airac_has_cs = True
 
     while next_charts_airac < TODAY:
         current_charts_airac = next_charts_airac
@@ -31,8 +31,8 @@ def deduce_current_next_airac():
     current_cs_airac = current_charts_airac
     next_cs_airac = current_charts_airac + timedelta(days=56)
     if next_airac_has_cs:
-        current_cs_airac -= timedelta(days=28)
-        next_cs_airac -= timedelta(days=28)
+        current_cs_airac = next_charts_airac - timedelta(days=56)
+        next_cs_airac = next_charts_airac
 
     return {
         "current_charts_airac": current_charts_airac,

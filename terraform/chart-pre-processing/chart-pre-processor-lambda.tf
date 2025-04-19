@@ -20,6 +20,7 @@ resource "aws_lambda_function" "aviationapi-chart-pre-processor-lambda" {
   environment {
     variables = {
       TRIGGER_CHART_PROCESSOR_TOPIC_ARN = var.TRIGGER_CHART_PROCESSOR_TOPIC.arn
+      AIRAC_TABLE_NAME                  = var.AIRAC_TABLE.name
     }
   }
 

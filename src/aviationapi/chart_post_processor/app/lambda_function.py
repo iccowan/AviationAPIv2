@@ -1,4 +1,5 @@
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
+from aviationapi.lib.logger import logInfo
 
 
 def get_airac_data(airac, cycle_chart_type):
@@ -8,7 +9,7 @@ def get_airac_data(airac, cycle_chart_type):
 
 
 def update_airac_data(airac_data, packet):
-    airac_data.airac_data_dict[packet] = True
+    airac_data.is_packet_processed[packet] = True
     is_retrieveable = True
 
     for _, is_packet_processed in airac_data.is_packet_processed.items():
@@ -27,6 +28,7 @@ def lambda_handler(event, context):
     cycle_chart_type = attributes["cycle_chart_type"]["Value"]
 
     airac_data = get_airac_data(airac, cycle_chart_type)
+
     if airac_data is None:
         logError(f"No {cycle_chart_type} airac data found for airac {airac}")
         return 1

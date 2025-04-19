@@ -28,4 +28,7 @@ module "chart-processing" {
 
 module "chart-post-processing" {
   source = "./chart-post-processing"
+
+  AIRAC_TABLE = module.db.aviationapi-airac-table
+  AIRAC_CYCLE_CHART_TYPE_INDEX_NAME = module.db.aviationapi-airac-table-airac-cycle-chart-type-index-name
 }

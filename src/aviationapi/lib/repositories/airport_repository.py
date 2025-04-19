@@ -9,7 +9,7 @@ from aviationapi.lib.logger import logError
 from aviationapi.lib.models.Airport import Airport
 from aviationapi.lib.models.Chart import Chart
 
-TABLE_NAME = os.environ.get("AIRPORTS_DB_NAME", "aviationapi-airports")
+TABLE_NAME = os.environ.get("AIRPORTS_TABLE_NAME", "aviationapi-airports")
 TABLE = boto3.resource("dynamodb").Table(TABLE_NAME)
 EXPIRATION_TIMESTAMP = int((datetime.now() + timedelta(days=120)).timestamp())
 

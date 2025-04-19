@@ -27,7 +27,7 @@ resource "aws_lambda_function" "aviationapi-chart-processor-lambda" {
       S3_BUCKET_NAME                         = var.S3_BUCKET.bucket
       UPLOAD_THREADS                         = 100
       CHART_BASE_URL                         = var.CHARTS_BASE_URL
-      AIRPORTS_DB_NAME                       = var.AIRPORTS_TABLE.name
+      AIRPORTS_TABLE_NAME                    = var.AIRPORTS_TABLE.name
       TRIGGER_CHART_POST_PROCESSOR_TOPIC_ARN = var.TRIGGER_CHART_POST_PROCESSOR_TOPIC.arn
     }
   }
