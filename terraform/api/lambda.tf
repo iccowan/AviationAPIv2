@@ -56,6 +56,16 @@ resource "aws_iam_role_policy" "lambda-aviationapi-api-role" {
           var.AIRAC_TABLE.arn,
           var.AIRPORTS_TABLE.arn
         ]
+      },
+      {
+        Sid    = "QueryTable"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:Query"
+        ],
+        Resource = [
+          var.AIRAC_TABLE.arn
+        ]
       }
     ]
   })
