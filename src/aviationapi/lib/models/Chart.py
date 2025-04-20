@@ -2,20 +2,20 @@ from enum import Enum
 
 
 class Chart:
-    def __init__(self, dict=None):
-        self.chart_name = ""
-        self.chart_sequence = ""
-        self.pdf_name = ""
-        self.pdf_url = ""
+    def __init__(self, chart_dict=None):
+        self.chart_name = None
+        self.chart_sequence = None
+        self.pdf_name = None
+        self.pdf_url = None
         self.did_change = False
         self.change_pdf_name = None
         self.change_pdf_url = None
 
-        if dict is not None:
-            for k, v in dict.items():
+        if chart_dict is not None:
+            for k, v in chart_dict.items():
                 setattr(self, k, v)
 
-    def db_dict(self):
+    def dict(self):
         dict_rep = {
             "chart_name": self.chart_name,
             "chart_sequence": self.chart_sequence,

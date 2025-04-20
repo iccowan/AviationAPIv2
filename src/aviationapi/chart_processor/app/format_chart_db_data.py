@@ -37,8 +37,8 @@ def update_current_chart_tags(
 
         current_chart.pdf_name = text.lower()
         current_chart.pdf_url = f"{CHART_BASE_URL}/{airac}/{text.lower()}"
-    if event == END_EVENT and tag == "cn_flg":
-        current_chart_data["chart_change"] = text == "Y"
+    if event == END_EVENT and tag == "useraction":
+        current_chart_data["chart_change"] = text == "C"
     if event == END_EVENT and tag == "chart_code":
         match text:
             case "APD":
@@ -59,10 +59,10 @@ def insert_chart_to_airport(current_airport, current_chart, current_chart_data):
     if current_chart_data["chart_change"]:
         current_chart.did_change = True
         current_chart.change_pdf_name = (
-            current_chart.pdf_name[:-4] + "_CMP" + current_chart.pdf_name[-4:]
+            current_chart.pdf_name[:-4] + "_cmp" + current_chart.pdf_name[-4:]
         )
         current_chart.change_pdf_url = (
-            current_chart.pdf_url[:-4] + "_CMP" + current_chart.pdf_url[-4:]
+            current_chart.pdf_url[:-4] + "_cmp" + current_chart.pdf_url[-4:]
         )
 
     if not current_chart_data["skip_chart"]:

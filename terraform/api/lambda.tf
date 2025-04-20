@@ -7,7 +7,7 @@ data "archive_file" "lambda-archive" {
 resource "aws_lambda_function" "aviationapi-api-lambda" {
   function_name = "aviationapi-api"
 
-  handler     = "app.main.handler"
+  handler     = "aviationapi.api.app.main.handler"
   runtime     = var.PY_VERSION
   memory_size = 256
   timeout     = 10
@@ -34,6 +34,28 @@ resource "aws_iam_role" "aviationapi-api-lambda-role" {
         Principal = {
           Service = "lambda.amazonaws.com"
         }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "lambda-aviationapi-api-role" {
+  name = "aviationapi-api-lambda-role-policy"
+  role = aws_iam_role.aviationapi-api-lambda-role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "ReadTable"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem"
+        ],
+        Resource = [
+          var.AIRAC_TABLE.arn,
+          var.AIRPORTS_TABLE.arn
+        ]
       }
     ]
   })

@@ -26,9 +26,21 @@ def get_airac_by_cycle_chart_type_and_airac(airac, cycle_chart_type):
 
     return AiracData(airac_data_dict=airac_dict)
 
+def get_all_airac(cycle_type):
+    airac_data_list = _query({"cycle_type": cycle_type})
+
+    if airac_data_list is None:
+        return None
+
+    if type(airac_data_list) is not list:
+        return AiracData(airac_data_dict=airac_data_list)
+
+    return [AiracData(airac_data_dict=airac_data) for airac_data in airac_data_list]
+
+
 
 def put_airac(airac):
-    _put(airac.db_dict())
+    _put(airac.dict())
 
 
 def delete_airac(airac):
@@ -37,13 +49,34 @@ def delete_airac(airac):
     )
 
 
-def _get(key, index=None):
+def _get(key):
     response = TABLE.get_item(Key=key)
 
     if "Item" in response:
         return response["Item"]
 
     return None
+
+def _query(key):
+    key_condition = None
+
+    for k, v in key.items():
+        if key_condition is None:
+            key_condition = Key(k).eq(v)
+            continue
+
+        key_condition = key_condition & Key(k).eq(v)
+        
+    response = TABLE.query(KeyConditionExpression=key_condition)
+
+    items = response["Items"]
+    if len(items) == 1:
+        return items[0]
+
+    if len(items) == 0:
+        return None
+
+    return items
 
 def _get_airac_by_airac_name_and_chart_type(key):
     response = TABLE.query(

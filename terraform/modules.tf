@@ -1,13 +1,15 @@
+module "db" {
+  source = "./db"
+}
+
 module "api" {
   source = "./api"
 
   DOMAIN     = var.DOMAIN
   ENV        = var.ENV
   ENV_SUFFIX = var.ENV_SUFFIX
-}
-
-module "db" {
-  source = "./db"
+  AIRAC_TABLE                   = module.db.aviationapi-airac-table
+  AIRPORTS_TABLE                     = module.db.aviationapi-airports-table
 }
 
 module "chart-pre-processing" {

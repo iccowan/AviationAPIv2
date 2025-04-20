@@ -13,3 +13,5 @@ variable "OUTPUT_PATH" {
 variable "DOMAIN" {}
 variable "ENV" {}
 variable "ENV_SUFFIX" {}
+variable "AIRAC_TABLE" {}
+variable "AIRPORTS_TABLE" {}

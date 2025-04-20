@@ -7,6 +7,7 @@ from botocore.exceptions import ClientError
 
 from aviationapi.lib.logger import logError
 from aviationapi.lib.models.Airport import Airport
+from aviationapi.lib.models.AirportChartSupplement import AirportChartSupplement
 from aviationapi.lib.models.Chart import Chart
 
 TABLE_NAME = os.environ.get("AIRPORTS_TABLE_NAME", "aviationapi-airports")
@@ -28,11 +29,33 @@ def generate_key(airport):
         "chart_type::airac": f"{entry_type}::{airport.airac}",
     }
 
+def get_airport(airport_name, airac, chart_type):
+    airport_dict = _get({
+        "unique_airport_id": airport_name,
+        "chart_type::airac": f"{chart_type}::{airac}"
+    })
+
+    if airport_dict is None:
+        return None
+
+    if chart_type == "cs":
+        return AirportChartSupplement(airac, airport_dict)
+
+    return Airport(airac, airport_dict)
+
 
 def put_airport(airport):
     _put(
-        airport.db_dict() | generate_key(airport) | {"expire_at": EXPIRATION_TIMESTAMP}
+        airport.dict() | generate_key(airport) | {"expire_at": EXPIRATION_TIMESTAMP}
     )
+
+def _get(key):
+    response = TABLE.get_item(Key=key)
+    
+    if "Item" in response:
+        return response["Item"]
+
+    return None
 
 
 def _put(airport_dict):

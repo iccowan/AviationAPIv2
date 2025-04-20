@@ -1,13 +1,20 @@
 from aviationapi.lib.models.AirportData import AirportData
+from aviationapi.lib.models.Chart import Chart
+
 
 
 class AirportChartSupplement:
-    TABLE_NAME = "aviationapi-airports"
-
-    def __init__(self, airac):
+    def __init__(self, airac, airport_dict={}):
         self.airac = airac
         self.airport_data = AirportData()
         self.charts = []
+
+        for k, v in airport_dict.items():
+            if k == "airport_data":
+                self.airport_data = AirportData(v)
+                continue
+
+            setattr(self, k, v)
 
     def reset_for_next_airport(self):
         self.charts = []
@@ -21,8 +28,8 @@ class AirportChartSupplement:
 
         return new
 
-    def db_dict(self):
-        return {"airport_data": self.airport_data.db_dict(), "charts": self.charts}
+    def dict(self):
+        return {"airport_data": self.airport_data.dict(), "charts": self.charts}
 
     def __repr__(self):
         return str(self.__dict__)

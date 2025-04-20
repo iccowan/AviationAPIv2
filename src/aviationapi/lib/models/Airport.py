@@ -2,15 +2,31 @@ from botocore.exceptions import ClientError
 
 from aviationapi.lib.logger import logError
 from aviationapi.lib.models.AirportData import AirportData
-from aviationapi.lib.models.Chart import ChartType
+from aviationapi.lib.models.Chart import Chart, ChartType
 
 
 class Airport:
-    def __init__(self, airac):
+    def __init__(self, airac, airport_dict={}):
         self.airac = airac
         self.airport_data = AirportData()
         self.charts = {}
         self.reset_for_next_airport()
+
+        for k, v in airport_dict.items():
+            if k == "airport_data":
+                self.airport_data = AirportData(v)
+                continue
+
+            if k == "charts":
+                charts_dict = {}
+                for chart_type, chart_list in v.items():
+                    charts_dict[chart_type] = [Chart(chart) for chart in chart_list]
+
+                self.charts = charts_dict
+                continue
+
+
+            setattr(self, k, v)
 
     def reset_for_next_airport(self):
         for chart_type in list(ChartType):
@@ -29,12 +45,12 @@ class Airport:
 
         return new
 
-    def db_dict(self):
+    def dict(self):
         charts_dict = {}
         for k, v in self.charts.items():
-            charts_dict[k] = [chart.db_dict() for chart in v]
+            charts_dict[k] = [chart.dict() for chart in v]
 
-        return {"airport_data": self.airport_data.db_dict(), "charts": charts_dict}
+        return {"airport_data": self.airport_data.dict(), "charts": charts_dict}
 
     def __repr__(self):
         return str(self.__dict__)

@@ -54,7 +54,7 @@ class AiracData:
             if k == "valid_date":
                 v = AiracData.date_str_to_datetime(v)
 
-            self.__dict__[k] = v
+            setattr(self, k, v)
 
     def date_str_to_datetime(date_str):
         return datetime.strptime(date_str, AiracData.VALID_DATE_FORMAT)
@@ -62,9 +62,15 @@ class AiracData:
     def valid_date_to_str(self):
         return self.valid_date.strftime(AiracData.VALID_DATE_FORMAT)
 
-    def db_dict(self):
+    def dict(self):
         self_dict = self.__dict__.copy()
         self_dict["valid_date"] = self.valid_date_to_str()
+
+        return self_dict
+
+    def api_dict(self):
+        self_dict = self.dict()
+        del self_dict["is_packet_processed"]
 
         return self_dict
 

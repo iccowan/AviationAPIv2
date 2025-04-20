@@ -1,19 +1,19 @@
 class AirportData:
-    def __init__(self, dict=None):
-        self.city = ""
-        self.state_abbr = ""
-        self.state_full = ""
+    def __init__(self, airport_data_dict=None):
+        self.city = None
+        self.state_abbr = None
+        self.state_full = None
         self.country = "USA"
         self.reset_airport_specific()
 
-        if dict is not None:
-            for k, v in dict.items():
+        if airport_data_dict is not None:
+            for k, v in airport_data_dict.items():
                 setattr(self, k, v)
 
     def reset_airport_specific(self):
-        self.icao_ident = ""
-        self.faa_ident = ""
-        self.airport_name = ""
+        self.icao_ident = None
+        self.faa_ident = None
+        self.airport_name = None
         self.is_military = False
 
     def copy(self):
@@ -29,7 +29,7 @@ class AirportData:
 
         return new
 
-    def db_dict(self):
+    def dict(self):
         dict_rep = {}
 
         for k, v in self.__dict__.items():
