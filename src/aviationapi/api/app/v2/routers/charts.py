@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-import aviationapi.api.app.lib.collectors.airport_collector as AirportCollector
+
 import aviationapi.api.app.lib.collectors.airac_data_collector as AiracDataCollector
+import aviationapi.api.app.lib.collectors.airport_collector as AirportCollector
 from aviationapi.lib.models.AirportChartSupplement import AirportChartSupplement
 
 router = APIRouter(prefix="/charts")
@@ -21,10 +22,10 @@ async def chart_supplement(airport: str, airac: int = 0):
 
     return AirportCollector.get_current_chart_supplement_for_airport(airport)
 
-@router.get('/available')
+
+@router.get("/available")
 async def check_available(airac: int = 0):
     if airac == 1:
         return AiracDataCollector.get_next_availability()
 
     return AiracDataCollector.get_current_availability()
-

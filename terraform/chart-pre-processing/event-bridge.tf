@@ -1,7 +1,7 @@
 resource "aws_cloudwatch_event_rule" "aviationapi-chart-pre-processor-trigger" {
   name                = "aviationapi-chart-pre-processor-trigger"
   schedule_expression = "cron(17 8 * * ? *)"
-  state = "ENABLED"
+  state               = "ENABLED"
 }
 
 resource "aws_cloudwatch_event_target" "aviationapi-chart-pre-processor-trigger" {

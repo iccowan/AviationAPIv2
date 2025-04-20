@@ -25,7 +25,6 @@ class Airport:
                 self.charts = charts_dict
                 continue
 
-
             setattr(self, k, v)
 
     def reset_for_next_airport(self):

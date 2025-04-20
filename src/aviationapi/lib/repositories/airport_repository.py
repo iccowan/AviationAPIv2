@@ -29,11 +29,14 @@ def generate_key(airport):
         "chart_type::airac": f"{entry_type}::{airport.airac}",
     }
 
+
 def get_airport(airport_name, airac, chart_type):
-    airport_dict = _get({
-        "unique_airport_id": airport_name,
-        "chart_type::airac": f"{chart_type}::{airac}"
-    })
+    airport_dict = _get(
+        {
+            "unique_airport_id": airport_name,
+            "chart_type::airac": f"{chart_type}::{airac}",
+        }
+    )
 
     if airport_dict is None:
         return None
@@ -45,13 +48,12 @@ def get_airport(airport_name, airac, chart_type):
 
 
 def put_airport(airport):
-    _put(
-        airport.dict() | generate_key(airport) | {"expire_at": EXPIRATION_TIMESTAMP}
-    )
+    _put(airport.dict() | generate_key(airport) | {"expire_at": EXPIRATION_TIMESTAMP})
+
 
 def _get(key):
     response = TABLE.get_item(Key=key)
-    
+
     if "Item" in response:
         return response["Item"]
 

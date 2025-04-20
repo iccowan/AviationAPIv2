@@ -2,7 +2,6 @@ from aviationapi.lib.models.AirportData import AirportData
 from aviationapi.lib.models.Chart import Chart
 
 
-
 class AirportChartSupplement:
     def __init__(self, airac, airport_dict={}):
         self.airac = airac

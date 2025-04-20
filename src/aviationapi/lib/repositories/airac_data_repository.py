@@ -1,9 +1,9 @@
 import os
 
 import boto3
+from boto3.dynamodb.conditions import Key
 
 from aviationapi.lib.models.AiracData import AiracData
-from boto3.dynamodb.conditions import Key
 
 TABLE_NAME = os.environ.get("AIRAC_TABLE_NAME", "aviationapi-airac")
 TABLE = boto3.resource("dynamodb").Table(TABLE_NAME)
@@ -19,12 +19,15 @@ def get_airac(cycle_type="next", cycle_chart_type="charts"):
 
 
 def get_airac_by_cycle_chart_type_and_airac(airac, cycle_chart_type):
-    airac_dict = _get_airac_by_airac_name_and_chart_type({"airac": airac, "cycle_chart_type": cycle_chart_type})
+    airac_dict = _get_airac_by_airac_name_and_chart_type(
+        {"airac": airac, "cycle_chart_type": cycle_chart_type}
+    )
 
     if airac_dict is None:
         return None
 
     return AiracData(airac_data_dict=airac_dict)
+
 
 def get_all_airac(cycle_type):
     airac_data_list = _query({"cycle_type": cycle_type})
@@ -36,7 +39,6 @@ def get_all_airac(cycle_type):
         return AiracData(airac_data_dict=airac_data_list)
 
     return [AiracData(airac_data_dict=airac_data) for airac_data in airac_data_list]
-
 
 
 def put_airac(airac):
@@ -57,6 +59,7 @@ def _get(key):
 
     return None
 
+
 def _query(key):
     key_condition = None
 
@@ -66,7 +69,7 @@ def _query(key):
             continue
 
         key_condition = key_condition & Key(k).eq(v)
-        
+
     response = TABLE.query(KeyConditionExpression=key_condition)
 
     items = response["Items"]
@@ -78,10 +81,12 @@ def _query(key):
 
     return items
 
+
 def _get_airac_by_airac_name_and_chart_type(key):
     response = TABLE.query(
         IndexName="airac_by_airac_name_and_chart_type",
-        KeyConditionExpression=Key("airac").eq(key["airac"]) & Key("cycle_chart_type").eq(key["cycle_chart_type"])
+        KeyConditionExpression=Key("airac").eq(key["airac"])
+        & Key("cycle_chart_type").eq(key["cycle_chart_type"]),
     )
 
     items = response["Items"]
@@ -92,7 +97,6 @@ def _get_airac_by_airac_name_and_chart_type(key):
         return None
 
     return items
-
 
 
 def _put(airac_dict):

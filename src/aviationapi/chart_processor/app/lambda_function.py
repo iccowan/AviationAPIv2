@@ -150,9 +150,7 @@ def upload_file_s3(s3_client, path, bucket_name, object_name):
 
 def push_charts_to_s3(airac, charts_path):
     logInfo("Pushing downloaded charts to S3")
-    s3_config = Config(
-        s3={"use_accelerate_endpoint": True}, max_pool_connections=UPLOAD_THREADS
-    )
+    s3_config = Config(max_pool_connections=UPLOAD_THREADS)
     s3_client = boto3.client("s3", config=s3_config)
     s3_object_name = f"{airac}/"
     logInfo(f"s3_bucket: {S3_BUCKET_NAME}, s3_object_path: {s3_object_name}")

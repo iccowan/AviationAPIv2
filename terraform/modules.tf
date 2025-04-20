@@ -5,11 +5,11 @@ module "db" {
 module "api" {
   source = "./api"
 
-  DOMAIN     = var.DOMAIN
-  ENV        = var.ENV
-  ENV_SUFFIX = var.ENV_SUFFIX
-  AIRAC_TABLE                   = module.db.aviationapi-airac-table
-  AIRPORTS_TABLE                     = module.db.aviationapi-airports-table
+  DOMAIN         = var.DOMAIN
+  ENV            = var.ENV
+  ENV_SUFFIX     = var.ENV_SUFFIX
+  AIRAC_TABLE    = module.db.aviationapi-airac-table
+  AIRPORTS_TABLE = module.db.aviationapi-airports-table
 }
 
 module "chart-pre-processing" {
@@ -31,6 +31,6 @@ module "chart-processing" {
 module "chart-post-processing" {
   source = "./chart-post-processing"
 
-  AIRAC_TABLE = module.db.aviationapi-airac-table
+  AIRAC_TABLE                       = module.db.aviationapi-airac-table
   AIRAC_CYCLE_CHART_TYPE_INDEX_NAME = module.db.aviationapi-airac-table-airac-cycle-chart-type-index-name
 }

@@ -17,11 +17,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "aviationapi-charts-lifecycle" 
   }
 }
 
-resource "aws_s3_bucket_accelerate_configuration" "aviationapi-charts-accelerate" {
-  bucket = aws_s3_bucket.aviationapi-charts.id
-  status = "Enabled"
-}
-
 resource "aws_s3_bucket_public_access_block" "aviationapi-charts-public-access" {
   bucket = aws_s3_bucket.aviationapi-charts.id
 
