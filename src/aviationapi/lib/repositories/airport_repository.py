@@ -17,7 +17,7 @@ EXPIRATION_TIMESTAMP = int((datetime.now() + timedelta(days=120)).timestamp())
 
 def generate_key(airport):
     id = airport.airport_data.icao_ident
-    if len(id) == 0:
+    if id is None or len(id) == 0:
         id = airport.airport_data.faa_ident
 
     entry_type = "tpp"
