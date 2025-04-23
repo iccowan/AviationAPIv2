@@ -1,17 +1,22 @@
 import os
-import pathlib
 import random
 from importlib import reload
 from unittest.mock import patch
 
+from pytest import MonkeyPatch, fixture
+
 import aviationapi.chart_processor.app
 import aviationapi.chart_processor.app.lambda_function
-from aviationapi.chart_processor.app.lambda_function import lambda_handler, process_standard_chart_packets
-from pytest import MonkeyPatch, fixture
+from aviationapi.chart_processor.app.lambda_function import (
+    lambda_handler,
+    process_standard_chart_packets,
+)
 
 
 @patch("aviationapi.chart_processor.app.lambda_function.process_standard_chart_packets")
-@patch("aviationapi.lib.messengers.trigger_chart_post_processor.publish_success_message")
+@patch(
+    "aviationapi.lib.messengers.trigger_chart_post_processor.publish_success_message"
+)
 @patch("shutil.rmtree")
 def test_lambda_handler_calls_process_standard_chart_packets_when_packet_abcd(
     shutil_rmtree, publish_success_message, process_standard_chart_packets
@@ -26,7 +31,7 @@ def test_lambda_handler_calls_process_standard_chart_packets_when_packet_abcd(
     process_standard_chart_packets.assert_called_once_with(packet, airac)
 
 
-'''
+"""
 @patch("aviationapi.chart_processor.app.lambda_function.process_chart_packet_with_db_and_changes")
 @patch("shutil.rmtree")
 def test_lambda_handler_calls_process_chart_packet_with_db_and_changes_when_packet_e(
@@ -161,7 +166,7 @@ def test_process_standard_chart_packets_calls_push_charts_to_s3(
 
     push_charts_to_s3.assert_called_once_with(airac, charts_path)
 
-'''
+"""
 
 
 def set_env(env):
