@@ -31,9 +31,10 @@ cd $PROJECT_PATH
 pip install -t $MODULE_PATH/build -r $PROJECT_PATH/requirements.txt --platform manylinux2014_x86_64 --only-binary=:all:
 
 
-pushd $MODULE_PATH/build
+PRESENT_PATH="$(pwd)"
+cd $MODULE_PATH/build
 zip -r ../build.zip .
-popd
+cd $PRESENT_PATH
 
 rm -r $MODULE_PATH/build
 
