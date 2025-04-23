@@ -15,4 +15,4 @@ cd $MODULE_PATH
 
 . $PROJECT_PATH/scripts/activate_venv.sh $MODULE_NAME
 
-pip3 install -r $PROJECT_PATH/requirements.txt -r $PROJECT_PATH/requirements.ci.txt -r $MODULE_PATH/requirements.txt
+pip3 install -r $PROJECT_PATH/requirements.txt -r $PROJECT_PATH/requirements.ci.txt

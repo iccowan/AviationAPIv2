@@ -28,7 +28,7 @@ cd $MODULE_PATH
 find app -name '*.py' -exec rsync -R {} "$MODULE_PATH/build/aviationapi/$MODULE" \;
 cd $PROJECT_PATH
 
-pip install -t $MODULE_PATH/build -r $PROJECT_PATH/requirements.txt -r $MODULE_PATH/requirements.txt --platform manylinux2014_x86_64 --only-binary=:all:
+pip install -t $MODULE_PATH/build -r $PROJECT_PATH/requirements.txt --platform manylinux2014_x86_64 --only-binary=:all:
 
 
 pushd $MODULE_PATH/build
