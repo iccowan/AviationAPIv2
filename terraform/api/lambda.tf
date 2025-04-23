@@ -1,9 +1,3 @@
-data "archive_file" "lambda-archive" {
-  type        = "zip"
-  source_dir  = var.SOURCE_DIR
-  output_path = var.OUTPUT_PATH
-}
-
 resource "aws_lambda_function" "aviationapi-api-lambda" {
   function_name = "aviationapi-api"
 
@@ -12,8 +6,7 @@ resource "aws_lambda_function" "aviationapi-api-lambda" {
   memory_size = 256
   timeout     = 10
 
-  filename         = var.OUTPUT_PATH
-  source_code_hash = data.archive_file.lambda-archive.output_base64sha256
+  filename         = var.INIT_LAMBDA
 
   role = aws_iam_role.aviationapi-api-lambda-role.arn
 

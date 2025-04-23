@@ -17,3 +17,7 @@ variable "ENV_SUFFIX" {
 variable "DYNAMODB_ENDPOINT" {
   default = ""
 }
+
+variable "INIT_LAMBDA" {
+  default = "empty_lambda.zip"
+}

@@ -1,9 +1,3 @@
-data "archive_file" "lambda-archive" {
-  type        = "zip"
-  source_dir  = var.SOURCE_DIR
-  output_path = var.OUTPUT_PATH
-}
-
 resource "aws_lambda_function" "aviationapi-chart-post-processor-lambda" {
   function_name = "aviationapi-chart-post-processor"
 
@@ -12,9 +6,8 @@ resource "aws_lambda_function" "aviationapi-chart-post-processor-lambda" {
   memory_size                    = 256
   timeout                        = 10
 
-  filename         = var.OUTPUT_PATH
+  filename         = var.INIT_LAMBDA
   handler          = "aviationapi.chart_post_processor.app.lambda_function.lambda_handler"
-  source_code_hash = data.archive_file.lambda-archive.output_base64sha256
 
   role = aws_iam_role.chart-post-processor-lambda-role.arn
 
