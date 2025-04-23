@@ -1,7 +1,7 @@
 name: validate code
 
 on:
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
   check-format:
@@ -49,7 +49,7 @@ jobs:
       - name: run tests
         run: pytest --junit-xml=test-results.xml
         env:
-          AWS_DEFAULT_REGION: us-east-1
+          AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
           AWS_ACCESS_KEY_ID: TESTINGANDNOTVALID
           AWS_SECRET_ACCESS_KEY: TESTINGANDNOTVALIDSECRET
 
