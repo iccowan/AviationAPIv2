@@ -60,3 +60,4 @@ jobs:
           path: test-results.xml
           summary: true
           fail-on-empty: true
+          title: PyTest Results
