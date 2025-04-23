@@ -1,5 +1,4 @@
 from aviationapi.lib.models.AirportData import AirportData
-from aviationapi.lib.models.Chart import Chart
 
 
 class AirportChartSupplement:

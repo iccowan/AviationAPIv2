@@ -2,13 +2,9 @@ import os
 from datetime import datetime, timedelta
 
 import boto3
-from boto3.dynamodb.conditions import Attr
-from botocore.exceptions import ClientError
 
-from aviationapi.lib.logger import logError
 from aviationapi.lib.models.Airport import Airport
 from aviationapi.lib.models.AirportChartSupplement import AirportChartSupplement
-from aviationapi.lib.models.Chart import Chart
 
 TABLE_NAME = os.environ.get("AIRPORTS_TABLE_NAME", "aviationapi-airports")
 TABLE = boto3.resource("dynamodb").Table(TABLE_NAME)

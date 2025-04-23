@@ -2,7 +2,6 @@ from fastapi import APIRouter
 
 import aviationapi.api.app.lib.collectors.airac_data_collector as AiracDataCollector
 import aviationapi.api.app.lib.collectors.airport_collector as AirportCollector
-from aviationapi.lib.models.AirportChartSupplement import AirportChartSupplement
 
 router = APIRouter(prefix="/charts")
 

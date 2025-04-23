@@ -1,6 +1,3 @@
-from botocore.exceptions import ClientError
-
-from aviationapi.lib.logger import logError
 from aviationapi.lib.models.AirportData import AirportData
 from aviationapi.lib.models.Chart import Chart, ChartType
 

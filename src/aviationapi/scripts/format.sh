@@ -12,18 +12,18 @@ if [ "$1" = "-c" ]; then
 fi
 
 if [ "$CHECK_ONLY" = "1" ]; then
-    autoflake -c -r -v --in-place --remove-unused-variables $DIRS
+    autoflake -c -r --in-place --remove-unused-variables --remove-all-unused-imports $DIRS
     EXIT_CODE=$(( EXIT_CODE + $? ))
     echo ""
-    isort $DIRS -c -v
+    isort $DIRS --profile "black" -c
     EXIT_CODE=$(( EXIT_CODE + $? ))
     echo ""
     black $DIRS --check
     EXIT_CODE=$(( EXIT_CODE + $? ))
 else
-    autoflake -r -v --in-place --remove-unused-variables $DIRS
+    autoflake -r --in-place --remove-unused-variables --remove-all-unused-imports $DIRS
     echo ""
-    isort $DIRS -v
+    isort $DIRS --profile "black"
     echo ""
     black $DIRS
 fi

@@ -3,14 +3,7 @@ import random
 from importlib import reload
 from unittest.mock import patch
 
-from pytest import MonkeyPatch, fixture
-
-import aviationapi.chart_processor.app
-import aviationapi.chart_processor.app.lambda_function
-from aviationapi.chart_processor.app.lambda_function import (
-    lambda_handler,
-    process_standard_chart_packets,
-)
+from aviationapi.chart_processor.app.lambda_function import lambda_handler
 
 
 @patch("aviationapi.chart_processor.app.lambda_function.process_standard_chart_packets")
