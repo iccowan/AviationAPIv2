@@ -41,4 +41,4 @@ rm -r $MODULE_PATH/build
 BUILD_NAME=$(echo "$MODULE" | tr "_" "-")
 aws s3 mv $MODULE_PATH/build.zip "s3://${S3_BUCKET_NAME}/$BUILD_NAME-$BUILD_NUMBER.zip"
 
-echo "$BUILD_NAME-$BUILD_NUMBER"
+echo "build-name=$BUILD_NAME-$BUILD_NUMBER" >> $GITHUB_OUTPUT

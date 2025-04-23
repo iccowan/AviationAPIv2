@@ -1,0 +1,74 @@
+name: build
+
+on: 
+  workflow_dispatch:
+      
+  push:
+    branches:
+      - main
+
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+env:
+  BUILD_NUMBER: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+      
+jobs:
+  validate:
+    uses: iccowan/AviationAPIv2/.github/workflows/validate.yml@main
+
+  build-api:
+    uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
+    needs: validate
+    with:
+      module-name: api
+      build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+    secrets:
+      BUILD_AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+      BUILD_AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+
+  build-chart-pre-processor:
+    uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
+    needs: validate
+    with:
+      module-name: chart_pre_processor
+      build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+    secrets:
+      BUILD_AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+      BUILD_AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+
+  build-chart-processor:
+    uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
+    needs: validate
+    with:
+      module-name: chart_processor
+      build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+    secrets:
+      BUILD_AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+      BUILD_AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+
+  build-chart-post-processor:
+    uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
+    needs: validate
+    with:
+      module-name: chart_post_processor
+      build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+    secrets:
+      BUILD_AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+      BUILD_AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+
+  build-names-summary:
+    runs-on: ubuntu-latest
+    needs: [build-api, build-chart-pre-processor, build-chart-processor, build-chart-post-processor]
+
+    steps:
+      - name: add build names to summary
+        run: |
+          echo "### Module Build Names"
+          echo "---"
+          echo "| Module | Build Name |" >> $GITHUB_STEP_SUMMARY
+          echo "| ------ | ---------- |" >> $GITHUB_STEP_SUMMARY
+          echo "| api | ${{ needs.build-api.outputs.build-name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| chart_pre_processor | ${{ needs.build-chart-pre-processor.outputs.build-name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| chart_processor | ${{ needs.build-chart-processor.outputs.build-name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| chart_post_processor | ${{ needs.build-chart-post-processor.outputs.build-name }} |" >> $GITHUB_STEP_SUMMARY

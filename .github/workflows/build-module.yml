@@ -1,7 +1,7 @@
 name: build module
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       module-name:
         required: true
@@ -9,10 +9,21 @@ on:
       build-number:
         required: true
         type: string
+    outputs:
+      build-name:
+        value: ${{ jobs.build-module.outputs.build-name }}
+    secrets:
+      BUILD_AWS_ACCESS_KEY_ID:
+        required: true
+      BUILD_AWS_SECRET_ACCESS_KEY:
+        required: true
+
 
 jobs:
   build-module:
     runs-on: ubuntu-latest
+    outputs:
+      build-name: ${{ steps.build.outputs.build-name }}
 
     steps:
       - name: checkout code
@@ -26,15 +37,13 @@ jobs:
           cache-dependency-path: |
             src/aviationapi/requirements.txt
 
-      - name: install dependencies
-        run: pip install -r src/aviationapi/requirements.txt
-
       - name: build
-        run: ./src/aviationapi/scripts/build.sh ${{ github.event.inputs.module-name }}
+        id: build
+        run: ./src/aviationapi/scripts/build.sh ${{ inputs.module-name }}
         env:
           AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
           S3_BUCKET_NAME: ${{ vars.BUILD_S3_BUCKET_NAME }}
-          BUILD_NUMBER: ${{ github.event.inputs.build-number }}
+          BUILD_NUMBER: ${{ inputs.build-number }}
 
