@@ -72,3 +72,19 @@ jobs:
           echo "| chart_pre_processor | ${{ needs.build-chart-pre-processor.outputs.build-name }} |" >> $GITHUB_STEP_SUMMARY
           echo "| chart_processor | ${{ needs.build-chart-processor.outputs.build-name }} |" >> $GITHUB_STEP_SUMMARY
           echo "| chart_post_processor | ${{ needs.build-chart-post-processor.outputs.build-name }} |" >> $GITHUB_STEP_SUMMARY
+
+  deploy-prod-on-main-build:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch' }}
+    needs: [build-api, build-chart-pre-processor, build-chart-processor, build-chart-post-processor]
+
+    steps:
+      - name: trigger deploy to prod
+        run: |
+          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=sandbox -f build-name=${{ needs.build-api.outputs.build-name }}
+          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=sandbox -f build-name=${{ needs.build-chart-pre-processor.outputs.build-name }}
+          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=sandbox -f build-name=${{ needs.build-chart-processor.outputs.build-name }}
+          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=sandbox -f build-name=${{ needs.build-chart-post-processor.outputs.build-name }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
