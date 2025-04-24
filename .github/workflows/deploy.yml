@@ -1,0 +1,27 @@
+name: deploy
+on: 
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: environment
+      module:
+        required: true
+        type: choice
+        options:
+          - api
+          - chart_pre_processor
+          - chart_processor
+          - chart_post_processor
+      build-name:
+        required: true
+        type: string
+
+jobs:
+  empty:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: empty
+        run: echo ""
+        
