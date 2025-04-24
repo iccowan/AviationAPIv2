@@ -28,3 +28,8 @@ async def check_available(airac: int = 0):
         return AiracDataCollector.get_next_availability()
 
     return AiracDataCollector.get_current_availability()
+
+
+@router.get("/test")
+async def test():
+    return {status: "test successful!!"}
