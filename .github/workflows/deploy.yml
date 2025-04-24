@@ -5,23 +5,39 @@ on:
       environment:
         required: true
         type: environment
-      module:
-        required: true
-        type: choice
-        options:
-          - api
-          - chart_pre_processor
-          - chart_processor
-          - chart_post_processor
       build-name:
         required: true
         type: string
 
 jobs:
-  empty:
+  get-lambda-name:
     runs-on: ubuntu-latest
+    outputs:
+      lambda-name: ${{ steps.get-lambda-name.outputs.lambda-name }}
 
     steps:
-      - name: empty
-        run: echo ""
-        
+      - name: get lambda name from build name
+        id: get-lambda-name
+        run: |
+          FULL_NAME="aviationapi-${{ inputs.build-name }}"
+          echo "lambda-name=${FULL_NAME%-*-*-*}" >> $GITHUB_OUTPUT
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    needs: get-lambda-name
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: deploy
+        run: ./src/aviationapi/scripts/deploy.sh
+        env:
+          AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEPLOY_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEPLOY_AWS_SECRET_ACCESS_KEY }}
+          LAMBDA_FUNCTION_NAME: ${{ needs.get-lambda-name.outputs.lambda-name }}
+          S3_BUCKET_NAME: ${{ vars.BUILD_S3_BUCKET_NAME }}
+          BUILD_NAME: ${{ inputs.build-name }}
+          AWS_PAGER: ""
