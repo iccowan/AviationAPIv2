@@ -13,10 +13,11 @@ on:
       build-name:
         value: ${{ jobs.build-module.outputs.build-name }}
     secrets:
-      BUILD_AWS_ACCESS_KEY_ID:
+      BUILD_ROLE_ARN:
         required: true
-      BUILD_AWS_SECRET_ACCESS_KEY:
-        required: true
+
+permissions:
+  id-token: write
 
 
 jobs:
@@ -37,13 +38,16 @@ jobs:
           cache-dependency-path: |
             src/aviationapi/requirements.txt
 
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          role-to-assume: ${{ secrets.BUILD_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
       - name: build
         id: build
         run: ./src/aviationapi/scripts/build.sh ${{ inputs.module-name }}
         env:
-          AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
           S3_BUCKET_NAME: ${{ vars.BUILD_S3_BUCKET_NAME }}
           BUILD_NUMBER: ${{ inputs.build-number }}
 

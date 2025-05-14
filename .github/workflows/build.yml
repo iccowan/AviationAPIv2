@@ -24,8 +24,7 @@ jobs:
       module-name: api
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
     secrets:
-      BUILD_AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-      BUILD_AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-chart-pre-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
@@ -34,8 +33,7 @@ jobs:
       module-name: chart_pre_processor
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
     secrets:
-      BUILD_AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-      BUILD_AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-chart-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
@@ -44,8 +42,7 @@ jobs:
       module-name: chart_processor
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
     secrets:
-      BUILD_AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-      BUILD_AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-chart-post-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
@@ -54,8 +51,7 @@ jobs:
       module-name: chart_post_processor
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
     secrets:
-      BUILD_AWS_ACCESS_KEY_ID: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
-      BUILD_AWS_SECRET_ACCESS_KEY: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-names-summary:
     runs-on: ubuntu-latest

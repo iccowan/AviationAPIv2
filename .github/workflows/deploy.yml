@@ -9,6 +9,9 @@ on:
         required: true
         type: string
 
+permissions:
+  id-token: write
+
 jobs:
   get-lambda-name:
     runs-on: ubuntu-latest
@@ -31,12 +34,15 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v4
 
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
       - name: deploy
         run: ./src/aviationapi/scripts/deploy.sh
         env:
-          AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.DEPLOY_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEPLOY_AWS_SECRET_ACCESS_KEY }}
           LAMBDA_FUNCTION_NAME: ${{ needs.get-lambda-name.outputs.lambda-name }}
           S3_BUCKET_NAME: ${{ vars.BUILD_S3_BUCKET_NAME }}
           BUILD_NAME: ${{ inputs.build-name }}
