@@ -17,6 +17,12 @@ jobs:
   validate:
     uses: iccowan/AviationAPIv2/.github/workflows/validate.yml@main
 
+  validate-tf:
+    uses: iccowan/AviationAPIv2/.github/workflows/validate-tf.yml@terraform-gha
+    secrets:
+      TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
+      TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
+
   build-api:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
     needs: validate

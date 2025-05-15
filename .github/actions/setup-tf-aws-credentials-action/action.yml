@@ -1,0 +1,35 @@
+name: setup terraform aws credentials
+
+inputs:
+  TF_ROLE_ARN:
+    required: true
+  TF_BACKEND_ROLE_ARN:
+    required: true
+  AWS_REGION:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: configure tf backend aws credentials
+      id: tf-backend-aws-cred
+      uses: aws-actions/configure-aws-credentials@v4.1.0
+      with:
+        role-to-assume: ${{ inputs.TF_BACKEND_ROLE_ARN }}
+        aws-region: ${{ inputs.AWS_REGION }}
+        output-credentials: true
+
+    - name: store tf backend aws credentials
+      shell: bash
+      run: |
+        aws configure set aws_access_key_id ${{ steps.tf-backend-aws-cred.outputs.aws-access-key-id }} --profile aviationapi-terraform
+        aws configure set aws_secret_access_key ${{ steps.tf-backend-aws-cred.outputs.aws-secret-access-key }} --profile aviationapi-terraform
+        aws configure set aws_session_token ${{ steps.tf-backend-aws-cred.outputs.aws-session-token }} --profile aviationapi-terraform
+
+    - name: configure aws credentials
+      uses: aws-actions/configure-aws-credentials@v4.1.0
+      with:
+        role-to-assume: ${{ inputs.TF_ROLE_ARN }}
+        aws-region: ${{ inputs.AWS_REGION }}
+
+
