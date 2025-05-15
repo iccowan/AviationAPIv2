@@ -10,7 +10,7 @@ module "api" {
   ENV_SUFFIX     = var.ENV_SUFFIX
   AIRAC_TABLE    = module.db.aviationapi-airac-table
   AIRPORTS_TABLE = module.db.aviationapi-airports-table
-  INIT_LAMBDA = var.INIT_LAMBDA
+  INIT_LAMBDA    = var.INIT_LAMBDA
 }
 
 module "chart-pre-processing" {
@@ -18,7 +18,7 @@ module "chart-pre-processing" {
 
   TRIGGER_CHART_PROCESSOR_TOPIC = module.chart-processing.trigger-chart-processor-topic
   AIRAC_TABLE                   = module.db.aviationapi-airac-table
-  INIT_LAMBDA = var.INIT_LAMBDA
+  INIT_LAMBDA                   = var.INIT_LAMBDA
 }
 
 module "chart-processing" {
@@ -28,7 +28,7 @@ module "chart-processing" {
   AIRPORTS_TABLE                     = module.db.aviationapi-airports-table
   CHARTS_BASE_URL                    = "https://${tolist(aws_cloudfront_distribution.aviationapi-charts-cloudfront.aliases)[0]}"
   TRIGGER_CHART_POST_PROCESSOR_TOPIC = module.chart-post-processing.trigger-chart-post-processor-topic
-  INIT_LAMBDA = var.INIT_LAMBDA
+  INIT_LAMBDA                        = var.INIT_LAMBDA
 }
 
 module "chart-post-processing" {
@@ -36,5 +36,5 @@ module "chart-post-processing" {
 
   AIRAC_TABLE                       = module.db.aviationapi-airac-table
   AIRAC_CYCLE_CHART_TYPE_INDEX_NAME = module.db.aviationapi-airac-table-airac-cycle-chart-type-index-name
-  INIT_LAMBDA = var.INIT_LAMBDA
+  INIT_LAMBDA                       = var.INIT_LAMBDA
 }
