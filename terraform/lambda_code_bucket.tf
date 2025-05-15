@@ -32,9 +32,9 @@ resource "aws_iam_policy" "aviationapi-source-code-policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "S3GetPutObject"
-        Effect   = "Allow"
-        Action   = [
+        Sid    = "S3GetPutObject"
+        Effect = "Allow"
+        Action = [
           "s3:GetObject",
           "s3:PutObject"
         ],
@@ -51,15 +51,15 @@ resource "aws_iam_policy" "aviationapi-deploy-policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "S3GetObject"
-        Effect   = "Allow"
-        Action   = [
+        Sid    = "S3GetObject"
+        Effect = "Allow"
+        Action = [
           "s3:GetObject"
         ],
         Resource = "${aws_s3_bucket.aviationapi-source-code.arn}/*"
       },
       {
-        Sid = "LambdaUpdateCode",
+        Sid    = "LambdaUpdateCode",
         Effect = "Allow",
         Action = [
           "lambda:UpdateFunctionCode"
@@ -76,11 +76,11 @@ resource "aws_iam_policy" "aviationapi-deploy-policy" {
 }
 
 resource "aws_iam_group_policy_attachment" "aviationapi-source-code-group" {
-  group = aws_iam_group.aviationapi-source-code-access-group.name
+  group      = aws_iam_group.aviationapi-source-code-access-group.name
   policy_arn = aws_iam_policy.aviationapi-source-code-policy.arn
 }
 
 resource "aws_iam_group_policy_attachment" "aviationapi-deploy-group" {
-  group = aws_iam_group.aviationapi-deploy-group.name
+  group      = aws_iam_group.aviationapi-deploy-group.name
   policy_arn = aws_iam_policy.aviationapi-deploy-policy.arn
 }
