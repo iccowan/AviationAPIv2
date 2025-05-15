@@ -7,12 +7,12 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "aviationapi-terraform-state"
-    profile = "aviationapi-terraform"
-    key = "terraform.tfstate"
-    region = "us-east-1"
+    bucket         = "aviationapi-terraform-state"
+    profile        = "aviationapi-terraform"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
     dynamodb_table = "aviationapi-terraform-lock"
-    encrypt = true
+    encrypt        = true
   }
 }
 
