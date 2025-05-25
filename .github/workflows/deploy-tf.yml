@@ -9,7 +9,7 @@ on:
         options:
           - sandbox
           - staging
-          - production
+          - prod
 
 permissions:
   id-token: write
@@ -46,7 +46,7 @@ jobs:
           terraform workspace select ${{ inputs.environment }}
           terraform plan
 
-  approval:
+  approve:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}-tf-approval
     needs: plan
@@ -57,7 +57,7 @@ jobs:
   apply:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    needs: approval
+    needs: approve
 
     steps:
       - name: checkout code
@@ -84,5 +84,5 @@ jobs:
         run: |
           cd terraform
           terraform workspace select ${{ inputs.environment }}
-          terraform plan
+          terraform apply
 

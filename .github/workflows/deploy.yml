@@ -8,7 +8,7 @@ on:
         options:
           - sandbox
           - staging
-          - production
+          - prod
       build-name:
         required: true
         type: string
