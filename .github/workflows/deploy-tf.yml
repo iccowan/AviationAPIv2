@@ -53,6 +53,7 @@ jobs:
         uses: sgametrio/terraform-summary-action@main
         with:
           log-file: terraform/terraform_plan_output.txt
+          title: ${{ inputs.environment }} terraform plan
 
   approve:
     runs-on: ubuntu-latest
