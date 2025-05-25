@@ -1,20 +1,19 @@
-name: validate terraform
+name: deploy terraform
 
 on:
-  workflow_call:
-    secrets:
-      TF_ROLE_ARN:
+  workflow_dispatch:
+    inputs:
+      environment:
         required: true
-      TF_BACKEND_ROLE_ARN:
-        required: true
+        type: environment
 
 permissions:
   id-token: write
 
 jobs:
-  plan-sandbox:
+  plan:
     runs-on: ubuntu-latest
-    environment: sandbox
+    environment: ${{ inputs.environment }}
 
     steps:
       - name: checkout code
@@ -37,20 +36,24 @@ jobs:
           cd terraform
           terraform init
 
-      - name: terraform check format
-        run: |
-          cd terraform
-          terraform fmt -check
-
       - name: terraform plan
         run: |
           cd terraform
-          terraform workspace select sandbox
+          terraform workspace select ${{ inputs.environment }}
           terraform plan
 
-  plan-staging:
+  approval:
     runs-on: ubuntu-latest
-    environment: sandbox
+    environment: ${{ inputs.environment }}-tf-approval
+    needs: plan
+
+    steps:
+      - run: echo "Approved to apply terraform changes to ${{ inputs.environment }}"
+
+  apply:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    needs: approval
 
     steps:
       - name: checkout code
@@ -73,40 +76,9 @@ jobs:
           cd terraform
           terraform init
 
-      - name: terraform plan
+      - name: terraform apply
         run: |
           cd terraform
-          terraform workspace select staging
-          terraform plan
-
-  plan-prod:
-    runs-on: ubuntu-latest
-    environment: sandbox
-
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
-
-      - name: setup aws credentials
-        uses: ./.github/actions/setup-tf-aws-credentials-action
-        with:
-          TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
-          TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
-
-      - name: setup terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.11.3
-
-      - name: terraform init
-        run: |
-          cd terraform
-          terraform init
-
-      - name: terraform plan
-        run: |
-          cd terraform
-          terraform workspace select prod
+          terraform workspace select ${{ inputs.environment }}
           terraform plan
 
