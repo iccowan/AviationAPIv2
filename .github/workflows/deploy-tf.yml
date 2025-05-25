@@ -5,7 +5,11 @@ on:
     inputs:
       environment:
         required: true
-        type: environment
+        type: choice
+        options:
+          - sandbox
+          - staging
+          - production
 
 permissions:
   id-token: write

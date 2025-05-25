@@ -4,7 +4,11 @@ on:
     inputs:
       environment:
         required: true
-        type: environment
+        type: choice
+        options:
+          - sandbox
+          - staging
+          - production
       build-name:
         required: true
         type: string
