@@ -61,5 +61,5 @@ jobs:
         run: |
           cd terraform
           terraform workspace select ${{ inputs.environment }}
-          terraform apply
+          terraform apply -auto-approve
 
