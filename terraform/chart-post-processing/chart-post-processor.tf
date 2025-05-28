@@ -16,10 +16,6 @@ resource "aws_lambda_function" "aviationapi-chart-post-processor-lambda" {
       AIRAC_TABLE_NAME = var.AIRAC_TABLE.name
     }
   }
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_iam_role" "chart-post-processor-lambda-role" {

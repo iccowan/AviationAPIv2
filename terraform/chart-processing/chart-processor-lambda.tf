@@ -24,10 +24,6 @@ resource "aws_lambda_function" "aviationapi-chart-processor-lambda" {
       TRIGGER_CHART_POST_PROCESSOR_TOPIC_ARN = var.TRIGGER_CHART_POST_PROCESSOR_TOPIC.arn
     }
   }
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_iam_role" "chart-processor-lambda-role" {

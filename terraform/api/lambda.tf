@@ -9,10 +9,6 @@ resource "aws_lambda_function" "aviationapi-api-lambda" {
   filename = var.INIT_LAMBDA
 
   role = aws_iam_role.aviationapi-api-lambda-role.arn
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_iam_role" "aviationapi-api-lambda-role" {
