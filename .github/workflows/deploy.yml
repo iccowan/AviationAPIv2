@@ -33,21 +33,36 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     needs: get-lambda-name
+    env:
+      AWS_PAGER: ""
 
     steps:
       - name: checkout code
         uses: actions/checkout@v4
 
-      - name: configure aws credentials
+      - name: configure aws credentials for deploy artifact download
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          role-to-assume: ${{ secrets.BUILD_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: download deploy artifact
+        run: |
+          aws s3api get-object  \
+            --bucket ${{ vars.BUILD_S3_BUCKET_NAME }} \
+            --key ${{ inputs.build-name }}.zip \
+            --no-cli-pager \
+            ${{ inputs.build-name }}.zip
+
+      - name: configure aws credentials for deploy
         uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
           role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: deploy
-        run: ./src/aviationapi/scripts/deploy.sh
-        env:
-          LAMBDA_FUNCTION_NAME: ${{ needs.get-lambda-name.outputs.lambda-name }}
-          S3_BUCKET_NAME: ${{ vars.BUILD_S3_BUCKET_NAME }}
-          BUILD_NAME: ${{ inputs.build-name }}
-          AWS_PAGER: ""
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ needs.get-lambda-name.outputs.lambda-name }} \
+            --zip-file ${{ inputs.build-name}}.zip \
+            --no-cli-pager
