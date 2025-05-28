@@ -95,11 +95,11 @@ jobs:
     steps:
       - name: trigger deploy to prod
         run: |
-          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=sandbox -f build-name=${{ needs.build-api.outputs.build-name }}
-          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=sandbox -f build-name=${{ needs.build-chart-pre-processor.outputs.build-name }}
-          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=sandbox -f build-name=${{ needs.build-chart-processor.outputs.build-name }}
-          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=sandbox -f build-name=${{ needs.build-chart-post-processor.outputs.build-name }}
-          gh workflow run deploy-tf.yml -R iccowan/AviationAPIv2 -r main -f environment=sandbox
+          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=prod -f build-name=${{ needs.build-api.outputs.build-name }}
+          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=prod -f build-name=${{ needs.build-chart-pre-processor.outputs.build-name }}
+          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=prod -f build-name=${{ needs.build-chart-processor.outputs.build-name }}
+          gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=prod -f build-name=${{ needs.build-chart-post-processor.outputs.build-name }}
+          gh workflow run deploy-tf.yml -R iccowan/AviationAPIv2 -r main -f environment=prod
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
