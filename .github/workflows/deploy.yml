@@ -64,5 +64,5 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name ${{ needs.get-lambda-name.outputs.lambda-name }} \
-            --zip-file ${{ inputs.build-name}}.zip \
+            --zip-file "fileb://${{ inputs.build-name }}.zip" \
             --no-cli-pager
