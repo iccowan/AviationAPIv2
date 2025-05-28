@@ -38,3 +38,15 @@ module "chart-post-processing" {
   AIRAC_CYCLE_CHART_TYPE_INDEX_NAME = module.db.aviationapi-airac-table-airac-cycle-chart-type-index-name
   INIT_LAMBDA                       = var.INIT_LAMBDA
 }
+
+module "gha-openid" {
+  source = "./gha-openid"
+
+  LAMBDA_FUNCTION_ARNS = [
+    module.api.lambda-function.arn,
+    module.chart-pre-processing.lambda-function.arn,
+    module.chart-processing.lambda-function.arn,
+    module.chart-post-processing.lambda-function.arn
+  ]
+  CODE_BUCKET_S3_ARN = aws_iam_policy.aviationapi-source-code-policy.arn
+}

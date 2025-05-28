@@ -6,7 +6,7 @@ resource "aws_lambda_function" "aviationapi-api-lambda" {
   memory_size = 256
   timeout     = 10
 
-  filename         = var.INIT_LAMBDA
+  filename = var.INIT_LAMBDA
 
   role = aws_iam_role.aviationapi-api-lambda-role.arn
 

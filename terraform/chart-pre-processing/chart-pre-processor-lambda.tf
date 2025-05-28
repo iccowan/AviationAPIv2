@@ -5,8 +5,8 @@ resource "aws_lambda_function" "aviationapi-chart-pre-processor-lambda" {
   memory_size = 256
   timeout     = 10
 
-  filename         = var.INIT_LAMBDA
-  handler          = "aviationapi.chart_pre_processor.app.lambda_function.lambda_handler"
+  filename = var.INIT_LAMBDA
+  handler  = "aviationapi.chart_pre_processor.app.lambda_function.lambda_handler"
 
   role = aws_iam_role.chart-pre-processor-lambda-role.arn
 
