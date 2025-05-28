@@ -35,6 +35,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     needs: approve
+    env:
+      TF_VAR_ENV: ${{ vars.TF_VAR_ENV }}
+      TF_VAR_ENV_SUFFIX: ${{ vars.TF_VAR_ENV_SUFFIX }}
 
     steps:
       - name: checkout code
