@@ -12,128 +12,26 @@ permissions:
   id-token: write
 
 jobs:
-  plan-sandbox:
-    runs-on: ubuntu-latest
-    environment: sandbox
-    env:
-      TF_VAR_ENV: ${{ vars.TF_VAR_ENV }}
-      TF_VAR_ENV_SUFFIX: ${{ vars.TF_VAR_ENV_SUFFIX }}
+  sandbox:
+    uses: iccowan/AviationAPIv2/.github/workflows/tf-plan.yml@main
+    with:
+      environment: sandbox
+    secrets:
+      TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
+      TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
 
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
+  staging:
+    uses: iccowan/AviationAPIv2/.github/workflows/tf-plan.yml@main
+    with:
+      environment: staging
+    secrets:
+      TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
+      TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
 
-      - name: setup aws credentials
-        uses: ./.github/actions/setup-tf-aws-credentials-action
-        with:
-          TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
-          TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
-
-      - name: setup terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.11.3
-
-      - name: terraform init
-        run: |
-          cd terraform
-          terraform init
-
-      - name: terraform check format
-        run: |
-          cd terraform
-          terraform fmt -check
-
-      - name: terraform plan
-        run: |
-          cd terraform
-          terraform workspace select sandbox
-          terraform plan | tee terraform_plan_output.txt
-
-      - name: add plan to summary
-        uses: sgametrio/terraform-summary-action@main
-        with:
-          log-file: terraform/terraform_plan_output.txt
-          title: sandbox terraform plan
-
-  plan-staging:
-    runs-on: ubuntu-latest
-    environment: staging
-    env:
-      TF_VAR_ENV: ${{ vars.TF_VAR_ENV }}
-      TF_VAR_ENV_SUFFIX: ${{ vars.TF_VAR_ENV_SUFFIX }}
-
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
-
-      - name: setup aws credentials
-        uses: ./.github/actions/setup-tf-aws-credentials-action
-        with:
-          TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
-          TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
-
-      - name: setup terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.11.3
-
-      - name: terraform init
-        run: |
-          cd terraform
-          terraform init
-
-      - name: terraform plan
-        run: |
-          cd terraform
-          terraform workspace select staging
-          terraform plan | tee terraform_plan_output.txt
-
-      - name: add plan to summary
-        uses: sgametrio/terraform-summary-action@main
-        with:
-          log-file: terraform/terraform_plan_output.txt
-          title: staging terraform plan
-
-  plan-prod:
-    runs-on: ubuntu-latest
-    environment: prod
-    env:
-      TF_VAR_ENV: ${{ vars.TF_VAR_ENV }}
-      TF_VAR_ENV_SUFFIX: ${{ vars.TF_VAR_ENV_SUFFIX }}
-
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
-
-      - name: setup aws credentials
-        uses: ./.github/actions/setup-tf-aws-credentials-action
-        with:
-          TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
-          TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
-
-      - name: setup terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.11.3
-
-      - name: terraform init
-        run: |
-          cd terraform
-          terraform init
-
-      - name: terraform plan
-        run: |
-          cd terraform
-          terraform workspace select prod
-          terraform plan | tee terraform_plan_output.txt
-
-      - name: add plan to summary
-        uses: sgametrio/terraform-summary-action@main
-        with:
-          log-file: terraform/terraform_plan_output.txt
-          title: prod terraform plan
-
+  prod:
+    uses: iccowan/AviationAPIv2/.github/workflows/tf-plan.yml@main
+    with:
+      environment: prod
+    secrets:
+      TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
+      TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
