@@ -191,9 +191,11 @@ def download_charts(packet, airac):
     zip_file_download_path.write_bytes(response.content)
 
     should_continue = True
-    if packet == "ChartSupplement" and response.status_code != 200:
+    if response.status_code != 200:
         should_continue = False
-        logInfo("28 day cycle only, no chart supplement files to update")
+        logInfo(
+            "Error downloading charts. Could this possibly be trying to download the chart supplement on a 28 day cycle?"
+        )
 
     return (zip_file_download_path, file_name, should_continue)
 
@@ -203,11 +205,6 @@ def insert_charts_to_dynamodb(airac, files_path):
 
     logInfo("Inserting charts to DynamoDB")
     logInfo("Finished inserting charts to DynamoDB")
-
-
-def download_chart_supplement(airac):
-    logInfo("Downloading and processing chart supplement")
-    logInfo(f"airac: {airac}")
 
 
 def download_and_unzip_charts(packet, airac):
@@ -220,17 +217,25 @@ def download_and_unzip_charts(packet, airac):
 
 
 def process_standard_chart_packets(packet, airac):
-    charts_path, _ = download_and_unzip_charts(packet, airac)
-    combine_associated_charts(charts_path)
-    push_charts_to_s3(airac, charts_path)
+    charts_path, success = download_and_unzip_charts(packet, airac)
+
+    if success:
+        combine_associated_charts(charts_path)
+        push_charts_to_s3(airac, charts_path)
+
+    return success
 
 
 def process_chart_packet_with_db_and_changes(packet, airac):
-    charts_path, _ = download_and_unzip_charts(packet, airac)
-    insert_charts_to_dynamodb(airac, charts_path)
-    charts_path /= "compare_pdf"
-    combine_associated_charts(charts_path)
-    push_charts_to_s3(airac, charts_path)
+    charts_path, success = download_and_unzip_charts(packet, airac)
+
+    if success:
+        insert_charts_to_dynamodb(airac, charts_path)
+        charts_path /= "compare_pdf"
+        combine_associated_charts(charts_path)
+        push_charts_to_s3(airac, charts_path)
+
+    return success
 
 
 def process_airport_codes(airac):
@@ -240,12 +245,14 @@ def process_airport_codes(airac):
 
 def process_chart_supplement(packet, airac):
     airport_codes = process_airport_codes(airac)
-    charts_path, should_continue = download_and_unzip_charts(packet, airac)
-    if should_continue:
+    charts_path, success = download_and_unzip_charts(packet, airac)
+    if success:
         ChartSupplementDataFormatter.insert_cs_to_dynamodb(
             airac, charts_path, airport_codes, MONTHS
         )
         push_charts_to_s3(airac, charts_path)
+
+    return success
 
 
 def lambda_handler(event, context):
@@ -256,25 +263,31 @@ def lambda_handler(event, context):
     cycle_chart_type = CycleChartTypes.CHARTS.value
 
     logInfo(f"packet: {packet}, airac: {airac}")
+    success = True
 
     match packet:
         case "A" | "B" | "C" | "D":
-            process_standard_chart_packets(packet, airac)
+            success = process_standard_chart_packets(packet, airac)
         case "E":
-            process_chart_packet_with_db_and_changes(packet, airac)
+            success = process_chart_packet_with_db_and_changes(packet, airac)
         case "ChartSupplement":
-            process_chart_supplement(packet, airac)
+            success = process_chart_supplement(packet, airac)
             cycle_chart_type = CycleChartTypes.CHART_SUPPLEMENT.value
         case _:
             logError("Invalid packet specified")
-            return 1
+            success = False
 
-    logInfo(
-        f"Sending success message to post processor for {cycle_chart_type} packet {packet} airac {airac}"
-    )
-    TriggerChartPostProcessorMessenger.publish_success_message(
-        airac, packet, cycle_chart_type
-    )
+    if success:
+        logInfo(
+            f"Sending success message to post processor for {cycle_chart_type} packet {packet} airac {airac}"
+        )
+        TriggerChartPostProcessorMessenger.publish_success_message(
+            airac, packet, cycle_chart_type
+        )
+    else:
+        logInfo(
+            f"Error processing {cycle_chart_type} packet {packet} airac {airac}. Success message not sent"
+        )
 
     logInfo("Cleaning up drive")
     shutil.rmtree(DOWNLOAD_PATH)
