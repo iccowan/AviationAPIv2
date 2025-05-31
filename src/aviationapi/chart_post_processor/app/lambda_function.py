@@ -33,4 +33,10 @@ def lambda_handler(event, context):
         logError(f"No {cycle_chart_type} airac data found for airac {airac}")
         return 1
 
+    logInfo(
+        f"Processing successful processing of packet {packet} for airac {airac} {cycle_chart_type}"
+    )
     update_airac_data(airac_data, packet)
+    logInfo(
+        f"Successfully saved processed status for packet {packet} for airac {airac} {cycle_chart_type}"
+    )
