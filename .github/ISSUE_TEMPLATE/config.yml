@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Sensitive Bug Reporting
+    url: mailto:ian@cowan.aero
+    about: Please email sensitive bugs to this email rather than opening an issue

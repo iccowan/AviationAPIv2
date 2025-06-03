@@ -1,0 +1,48 @@
+name: Bug Report
+description: Report a bug.
+title: "🪲 "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for submitting a bug report. Please fill out the following information as accurately as possible and we will review the issue ASAP.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Issue
+      description: Please explain what went wrong. Be sure to include what you expected to happen.
+    validations:
+      required: true
+  - type: dropdown
+    id: system
+    attributes:
+      label: System Affected
+      description: Does this affect the API, frontend, or both?
+      multiple: true
+      options:
+        - API
+        - Frontend
+        - Both
+    validations:
+        required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      description: If applicable, please select the browser you are seeing this issue in.
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Microsoft Edge
+        - Safari
+        - Other (Please specify below)
+    validations:
+        required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional Information
+      description: Please include any additional relevant information
+
