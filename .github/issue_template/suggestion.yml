@@ -1,0 +1,29 @@
+name: Suggestion
+description: Add a suggestion or improvement request
+title: "[Enhancement]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We are always welcome to suggestions and improvement requests. Please explain your suggestion in as much detail as possible, and we will review it as soon as possible.
+  - type: textarea
+    id: description
+    attributes:
+      label: Suggestion
+      description: Please explain your suggestion or improvement request with as much detail as possible.
+    validations:
+      required: true
+  - type: dropdown
+    id: system
+    attributes:
+      label: System
+      description: Is this an improvement to the API, frontend, or both?
+      multiple: true
+      options:
+        - API
+        - Frontend
+        - Both
+        - Unsure
+      validations:
+        required: true
