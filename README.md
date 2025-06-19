@@ -1,7 +1,7 @@
 <!-- PROJECT LOGO -->
 <div align="center">
   <a href="https://github.com/iccowan/AviationAPIv2">
-    <img src="https://github.com/iccowan/AviationAPIv2/blob/add-readme/logo/aviationapi.svg" alt="Logo" height="80">
+    <img src="https://github.com/iccowan/AviationAPIv2/blob/main/logo/aviationapi.svg" alt="Logo" height="80">
   </a>
   <br />
   <br />
