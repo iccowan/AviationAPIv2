@@ -7,8 +7,11 @@
 	import { FileText } from '@lucide/svelte';
 	import { HandCoins } from '@lucide/svelte';
 	import { LinkWithPopup } from '$lib/components/link-with-popup';
+	import { goto } from '$app/navigation';
 
 	let airport: string = $state('');
+
+	const submitAirport = () => goto(`/charts?airport=${airport}`);
 </script>
 
 <div class="flex min-h-screen min-w-screen flex-col items-center justify-center align-middle">
@@ -23,14 +26,16 @@
 			<Card.Title>Search for Charts</Card.Title>
 		</Card.Header>
 		<Card.Content>
-			<div class="mb-5 flex justify-center">
-				<Input
-					bind:value={airport}
-					placeholder="Airport ICAO (i.e. KATL)"
-					class="w-1/2 text-center"
-				/>
-			</div>
-			<Button href="/charts?airport={airport}">Search</Button>
+			<form on:submit={submitAirport}>
+				<div class="mb-5 flex justify-center">
+					<Input
+						bind:value={airport}
+						placeholder="Airport ICAO (i.e. KATL)"
+						class="w-1/2 text-center"
+					/>
+				</div>
+				<Button type="submit" class="cursor-pointer">Search</Button>
+			</form>
 		</Card.Content>
 		<Card.Footer class="text-muted-foreground justify-center text-sm">
 			<LinkWithPopup text="Open Source on GitHub" href="https://github.com/iccowan/AviationAPIv2">

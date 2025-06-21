@@ -40,13 +40,13 @@
 		];
 	});
 
-	const updateCurrentChart =  (chart: Chart, sectionName: string) => {
+	const updateCurrentChart = (chart: Chart, sectionName: string) => {
 		currentChart = {
 			name: chart.chart_name,
 			section: sectionName,
 			pdfUrl: chart.pdf_url
 		};
-	}
+	};
 </script>
 
 <Sidebar.Root bind:ref {...restProps}>

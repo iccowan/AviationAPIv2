@@ -18,7 +18,7 @@ export interface Chart {
 	did_change: boolean;
 	change_pdf_name: string;
 	change_pdf_url: string;
-  section: string;
+	section: string;
 }
 
 export interface Airport {
