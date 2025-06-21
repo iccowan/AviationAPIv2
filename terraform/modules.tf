@@ -39,6 +39,14 @@ module "chart-post-processing" {
   INIT_LAMBDA                       = var.INIT_LAMBDA
 }
 
+module "www" {
+  source = "./www"
+
+  DOMAIN         = var.DOMAIN
+  ENV_SUFFIX     = var.ENV_SUFFIX
+  WWW_ENV_SUFFIX = var.WWW_ENV_SUFFIX
+}
+
 module "gha-openid" {
   source = "./gha-openid"
 
@@ -48,5 +56,6 @@ module "gha-openid" {
     module.chart-processing.lambda-function.arn,
     module.chart-post-processing.lambda-function.arn
   ]
+  WWW_S3_BUCKET_ARN  = module.www.www-s3-bucket.arn
   CODE_BUCKET_S3_ARN = aws_iam_policy.aviationapi-source-code-policy.arn
 }

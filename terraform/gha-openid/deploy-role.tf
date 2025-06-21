@@ -41,9 +41,34 @@ resource "aws_iam_policy" "aviationapi-deploy-policy" {
   })
 }
 
+resource "aws_iam_policy" "aviationapi-www-deploy-policy" {
+  name = "aviationapi-www-deploy-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "S3BucketUpdateFrontendCode"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        Resource = ["${var.WWW_S3_BUCKET_ARN}/*", var.WWW_S3_BUCKET_ARN]
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "gha-deploy-role-deploy-policy" {
   role       = aws_iam_role.gha-deploy-role.name
   policy_arn = aws_iam_policy.aviationapi-deploy-policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "gha-deploy-role-www-deploy-policy" {
+  role       = aws_iam_role.gha-deploy-role.name
+  policy_arn = aws_iam_policy.aviationapi-www-deploy-policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "gha-deploy-role-s3-bucket-policy" {

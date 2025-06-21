@@ -47,7 +47,7 @@ jobs:
       - name: terraform check format
         run: |
           cd terraform
-          terraform fmt -check
+          terraform fmt -recursive -check
 
       - name: terraform plan
         run: |
