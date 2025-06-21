@@ -14,6 +14,10 @@ variable "ENV_SUFFIX" {
   default = "-sandbox"
 }
 
+variable "WWW_ENV_SUFFIX" {
+  default = "-sandbox"
+}
+
 variable "DYNAMODB_ENDPOINT" {
   default = ""
 }

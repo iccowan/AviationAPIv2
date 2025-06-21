@@ -39,6 +39,14 @@ module "chart-post-processing" {
   INIT_LAMBDA                       = var.INIT_LAMBDA
 }
 
+module "www" {
+  source = "./www"
+
+  DOMAIN         = var.DOMAIN
+  ENV_SUFFIX     = var.ENV_SUFFIX
+  WWW_ENV_SUFFIX = var.WWW_ENV_SUFFIX
+}
+
 module "gha-openid" {
   source = "./gha-openid"
 

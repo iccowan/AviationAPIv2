@@ -1,0 +1,22 @@
+name: validate frontend
+
+on: workflow_call
+
+jobs:
+  check-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.16
+
+      - name: install dependencies
+        run: cd www && bun install --no-save
+
+      - name: check formatting
+        run: cd www && bun lint

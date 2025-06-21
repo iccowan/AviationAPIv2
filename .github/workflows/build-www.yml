@@ -1,0 +1,47 @@
+name: build frontend
+
+on:
+  workflow_call:
+    inputs:
+      build-number:
+        required: true
+        type: string
+    outputs:
+      build-name:
+        value: ${{ jobs.build-www.outputs.build-name }}
+    secrets:
+      BUILD_ROLE_ARN:
+        required: true
+
+permissions:
+  id-token: write
+
+
+jobs:
+  build-www:
+    runs-on: ubuntu-latest
+    outputs:
+      build-name: ${{ steps.build.outputs.build-name }}
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.16
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          role-to-assume: ${{ secrets.BUILD_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: build
+        id: build
+        run: cd www && bun install --no-save && bun run build
+        env:
+          S3_BUCKET_NAME: ${{ vars.BUILD_S3_BUCKET_NAME }}
+          BUILD_NUMBER: ${{ inputs.build-number }}
+

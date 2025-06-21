@@ -14,6 +14,9 @@ env:
   BUILD_NUMBER: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
       
 jobs:
+  validate-frontend:
+    uses: iccowan/AviationAPIv2/.github/workflows/validate-www.yml@main
+
   validate:
     uses: iccowan/AviationAPIv2/.github/workflows/validate.yml@main
 
@@ -22,6 +25,14 @@ jobs:
     secrets:
       TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
       TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
+
+  build-frontend:
+    uses: iccowan/AviationAPIv2/.github/workflows/build-www.yml@main
+    needs: validate-frontend
+    with:
+      build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+    secrets:
+      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-api:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
@@ -61,7 +72,7 @@ jobs:
 
   build-names-summary:
     runs-on: ubuntu-latest
-    needs: [build-api, build-chart-pre-processor, build-chart-processor, build-chart-post-processor]
+    needs: [build-frontend, build-api, build-chart-pre-processor, build-chart-processor, build-chart-post-processor]
     env:
       OUTPUT_FILE: "output.md"
 
@@ -72,6 +83,7 @@ jobs:
           echo "---" >> $OUTPUT_FILE
           echo "| Module | Build Name |" >> $OUTPUT_FILE
           echo "| ------ | ---------- |" >> $OUTPUT_FILE
+          echo "| www | ${{ needs.build-frontend.outputs.build-name }} |" >> $OUTPUT_FILE
           echo "| api | ${{ needs.build-api.outputs.build-name }} |" >> $OUTPUT_FILE
           echo "| chart_pre_processor | ${{ needs.build-chart-pre-processor.outputs.build-name }} |" >> $OUTPUT_FILE
           echo "| chart_processor | ${{ needs.build-chart-processor.outputs.build-name }} |" >> $OUTPUT_FILE
@@ -90,7 +102,7 @@ jobs:
   deploy-prod-on-main-build:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch' }}
-    needs: [build-api, build-chart-pre-processor, build-chart-processor, build-chart-post-processor, validate-tf]
+    needs: [build-frontend, build-api, build-chart-pre-processor, build-chart-processor, build-chart-post-processor, validate-tf]
 
     steps:
       - name: trigger deploy to prod
