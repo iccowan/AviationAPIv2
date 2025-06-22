@@ -13,7 +13,7 @@
 	let { data }: PageProps = $props();
 
 	const airportName: string = data.airportName;
-	let airport: Airport;
+	let airport: Airport = $state();
 	let currentChart: Chart = $state();
 
 	let chartsLoaded: boolean = $state(false);
@@ -109,6 +109,7 @@
 		</header>
 		<div class="flex flex-1 flex-col gap-4 p-4">
 			<iframe
+				title={isLoaded ? currentChart.name : 'Chart Loading'}
 				src={isLoaded ? currentChart.pdfUrl : ''}
 				frameborder="0"
 				style="width:100%; height:100%"
