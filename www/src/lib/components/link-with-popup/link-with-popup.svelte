@@ -1,18 +1,20 @@
 <script lang="ts">
 	import * as HoverCard from '$lib/components/ui/hover-card';
-	import { type WithElementRef } from '$lib/utils.js';
-	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
+	import type { Component } from 'svelte';
 
-	export type LinkWithPopupProps = WithElementRef<HTMLButtonAttributes> &
-		WithElementRef<HTMLAnchorAttributes>;
+	interface LinkWithPopupProps {
+		text: string;
+		href: string;
+		Icon: Component;
+	}
 
-	let { text = '', href = undefined }: LinkWithPopupProps = $props();
+	let { text = '', href = '', Icon }: LinkWithPopupProps = $props();
 </script>
 
 <div class="mx-2">
 	<HoverCard.Root>
 		<HoverCard.Trigger {href} target="_blank">
-			<slot name="icon" />
+			<Icon />
 		</HoverCard.Trigger>
 		<HoverCard.Content class="w-auto">
 			<p class="text-muted-foreground text-center text-sm">

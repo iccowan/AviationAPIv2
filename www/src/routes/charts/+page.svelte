@@ -9,11 +9,12 @@
 	import LoadingOverlay from '$lib/components/loading-overlay/loading-overlay.svelte';
 	import type { PageProps } from './$types';
 	import type { Airport, Chart } from './types.ts';
+	import { env } from '$env/dynamic/public';
 
 	let { data }: PageProps = $props();
 
 	const airportName: string = data.airportName;
-	let airport: Airport;
+	let airport: Airport = $state();
 	let currentChart: Chart = $state();
 
 	let chartsLoaded: boolean = $state(false);
@@ -21,8 +22,8 @@
 	let isLoaded: boolean = $derived(chartsLoaded && chartSupplementLoaded);
 
 	const unableToLoadCharts = () => {
-		toast.error('Unable to Load Charts for ' + airportName, {
-			description: 'No charts were found for ' + airportName + '. Please try searching again',
+		toast.error(`Unable to Load Charts for ${airportName}`, {
+			description: `No charts were found for ${airportName}. Please try searching again`,
 			duration: Infinity,
 			action: {
 				label: 'Search Again',
@@ -32,7 +33,7 @@
 	};
 
 	onMount(async () => {
-		fetch('https://api-v2.aviationapi.com/v2/charts?airport=' + airportName)
+		fetch(`${env.PUBLIC_API_URI}/charts?airport=${airportName}`)
 			.then((response) => {
 				if (!response.ok) {
 					unableToLoadCharts();
@@ -61,7 +62,7 @@
 				chartsLoaded = true;
 			});
 
-		fetch('https://api-v2.aviationapi.com/v2/charts/chart-supplement?airport=' + airportName)
+		fetch(`${env.PUBLIC_API_URI}/charts/chart-supplement?airport=${airportName}`)
 			.then((response) => response.json())
 			.then((data) => {
 				airport = {
@@ -109,6 +110,7 @@
 		</header>
 		<div class="flex flex-1 flex-col gap-4 p-4">
 			<iframe
+				title={isLoaded ? currentChart.name : 'Chart Loading'}
 				src={isLoaded ? currentChart.pdfUrl : ''}
 				frameborder="0"
 				style="width:100%; height:100%"

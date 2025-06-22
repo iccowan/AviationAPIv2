@@ -11,7 +11,10 @@
 
 	let airport: string = $state('');
 
-	const submitAirport = () => goto(`/charts?airport=${airport}`);
+	const submitAirport = (event: HTMLFormElement) => {
+		event.preventDefault();
+		goto(`/charts?airport=${airport}`);
+	};
 </script>
 
 <div class="flex min-h-screen min-w-screen flex-col items-center justify-center align-middle">
@@ -26,7 +29,7 @@
 			<Card.Title>Search for Charts</Card.Title>
 		</Card.Header>
 		<Card.Content>
-			<form on:submit={submitAirport}>
+			<form onsubmit={submitAirport}>
 				<div class="mb-5 flex justify-center">
 					<Input
 						bind:value={airport}
@@ -38,24 +41,29 @@
 			</form>
 		</Card.Content>
 		<Card.Footer class="text-muted-foreground justify-center text-sm">
-			<LinkWithPopup text="Open Source on GitHub" href="https://github.com/iccowan/AviationAPIv2">
-				<Github slot="icon" />
-			</LinkWithPopup>
+			<LinkWithPopup
+				text="Open Source on GitHub"
+				href="https://github.com/iccowan/AviationAPIv2"
+				Icon={Github}
+			/>
 			&bull;
-			<LinkWithPopup text="Join the Conversation on Discord" href="https://discord.gg/CWRGN4DStU">
-				<MessageCircle slot="icon" />
-			</LinkWithPopup>
+			<LinkWithPopup
+				text="Join the Conversation on Discord"
+				href="https://discord.gg/CWRGN4DStU"
+				Icon={MessageCircle}
+			/>
 			&bull;
 			<LinkWithPopup
 				text="API Documentation for Developers"
 				href="https://api-v2.aviationapi.com/v2/docs"
-			>
-				<FileText slot="icon" />
-			</LinkWithPopup>
+				Icon={FileText}
+			/>
 			&bull;
-			<LinkWithPopup text="Donate to Support AviationAPI" href="https://www.aviationapi.com/donate">
-				<HandCoins slot="icon" />
-			</LinkWithPopup>
+			<LinkWithPopup
+				text="Donate to Support AviationAPI"
+				href="https://www.aviationapi.com/donate"
+				Icon={HandCoins}
+			/>
 		</Card.Footer>
 	</Card.Root>
 	<div class="w-3/4 text-center md:w-1/2 lg:w-1/3">
