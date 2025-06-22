@@ -9,6 +9,7 @@
 	import LoadingOverlay from '$lib/components/loading-overlay/loading-overlay.svelte';
 	import type { PageProps } from './$types';
 	import type { Airport, Chart } from './types.ts';
+	import { PUBLIC_API_URI } from '$env/static/public';
 
 	let { data }: PageProps = $props();
 
@@ -21,8 +22,8 @@
 	let isLoaded: boolean = $derived(chartsLoaded && chartSupplementLoaded);
 
 	const unableToLoadCharts = () => {
-		toast.error('Unable to Load Charts for ' + airportName, {
-			description: 'No charts were found for ' + airportName + '. Please try searching again',
+		toast.error(`Unable to Load Charts for ${airportName}`, {
+			description: `No charts were found for ${airportName}. Please try searching again`,
 			duration: Infinity,
 			action: {
 				label: 'Search Again',
@@ -32,7 +33,7 @@
 	};
 
 	onMount(async () => {
-		fetch('https://api-v2.aviationapi.com/v2/charts?airport=' + airportName)
+		fetch(`${PUBLIC_API_URI}/charts?airport=${airportName}`)
 			.then((response) => {
 				if (!response.ok) {
 					unableToLoadCharts();
@@ -61,7 +62,7 @@
 				chartsLoaded = true;
 			});
 
-		fetch('https://api-v2.aviationapi.com/v2/charts/chart-supplement?airport=' + airportName)
+		fetch(`${PUBLIC_API_URI}/charts/chart-supplement?airport=${airportName}`)
 			.then((response) => response.json())
 			.then((data) => {
 				airport = {
