@@ -26,7 +26,7 @@
 			<Card.Title>Search for Charts</Card.Title>
 		</Card.Header>
 		<Card.Content>
-			<form on:submit={submitAirport}>
+			<form on:submit|preventDefault={submitAirport}>
 				<div class="mb-5 flex justify-center">
 					<Input
 						bind:value={airport}
