@@ -44,6 +44,10 @@ jobs:
       - name: unzip deploy artifact
         run: unzip ${{ inputs.build-name }}.zip -d build
 
+      - name: set environment variables
+        run: |
+          echo 'export const env={"PUBLIC_API_URI":"${{ vars.PUBLIC_API_URI }}"}' > build/_app/env.js
+
       - name: configure aws credentials for deploy
         uses: aws-actions/configure-aws-credentials@v4.1.0
         with:

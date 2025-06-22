@@ -44,4 +44,5 @@ jobs:
         env:
           S3_BUCKET_NAME: ${{ vars.BUILD_S3_BUCKET_NAME }}
           BUILD_NUMBER: ${{ inputs.build-number }}
+          PUBLIC_API_URI: "https://api-v2.aviationapi.com/v2"
 

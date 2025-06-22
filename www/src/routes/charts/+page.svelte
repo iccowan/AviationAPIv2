@@ -9,7 +9,7 @@
 	import LoadingOverlay from '$lib/components/loading-overlay/loading-overlay.svelte';
 	import type { PageProps } from './$types';
 	import type { Airport, Chart } from './types.ts';
-	import { PUBLIC_API_URI } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 
 	let { data }: PageProps = $props();
 
@@ -33,7 +33,7 @@
 	};
 
 	onMount(async () => {
-		fetch(`${PUBLIC_API_URI}/charts?airport=${airportName}`)
+		fetch(`${env.PUBLIC_API_URI}/charts?airport=${airportName}`)
 			.then((response) => {
 				if (!response.ok) {
 					unableToLoadCharts();
@@ -62,7 +62,7 @@
 				chartsLoaded = true;
 			});
 
-		fetch(`${PUBLIC_API_URI}/charts/chart-supplement?airport=${airportName}`)
+		fetch(`${env.PUBLIC_API_URI}/charts/chart-supplement?airport=${airportName}`)
 			.then((response) => response.json())
 			.then((data) => {
 				airport = {
