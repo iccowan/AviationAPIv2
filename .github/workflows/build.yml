@@ -7,68 +7,85 @@ on:
     branches:
       - main
 
-  pull_request:
+  pull_request_target:
     types: [opened, reopened, synchronize]
 
 env:
   BUILD_NUMBER: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
       
 jobs:
+  generate-ref:
+    runs-on: ubuntu-latest
+    outputs:
+      ref: ${{ steps.generate-ref.outputs.ref }}
+
+    steps:
+      - name: generate ref
+        id: generate-ref
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request_target" ]
+          then
+            echo "ref=${{ github.event.pull_request.merge_commit_sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
+          fi
+
   validate-frontend:
     uses: iccowan/AviationAPIv2/.github/workflows/validate-www.yml@main
+    needs: generate-ref
+    with:
+      ref: ${{ needs.generate-ref.outputs.ref }}
 
   validate:
     uses: iccowan/AviationAPIv2/.github/workflows/validate.yml@main
+    needs: generate-ref
+    with:
+      ref: ${{ needs.generate-ref.outputs.ref }}
 
   validate-tf:
     uses: iccowan/AviationAPIv2/.github/workflows/validate-tf.yml@main
-    secrets:
-      TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
-      TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
+    needs: generate-ref
+    with:
+      ref: ${{ needs.generate-ref.outputs.ref }}
 
   build-frontend:
     uses: iccowan/AviationAPIv2/.github/workflows/build-www.yml@main
-    needs: validate-frontend
+    needs: [validate-frontend, generate-ref]
     with:
+      ref: ${{ needs.generate-ref.outputs.ref }}
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
-    secrets:
-      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-api:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: validate
+    needs: [validate, generate-ref]
     with:
+      ref: ${{ needs.generate-ref.outputs.ref }}
       module-name: api
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
-    secrets:
-      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-chart-pre-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: validate
+    needs: [validate, generate-ref]
     with:
+      ref: ${{ needs.generate-ref.outputs.ref }}
       module-name: chart_pre_processor
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
-    secrets:
-      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-chart-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: validate
+    needs: [validate, generate-ref]
     with:
+      ref: ${{ needs.generate-ref.outputs.ref }}
       module-name: chart_processor
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
-    secrets:
-      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-chart-post-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: validate
+    needs: [validate, generate-ref]
     with:
+      ref: ${{ needs.generate-ref.outputs.ref }}
       module-name: chart_post_processor
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
-    secrets:
-      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-names-summary:
     runs-on: ubuntu-latest
@@ -93,7 +110,7 @@ jobs:
         run: cat $OUTPUT_FILE >> $GITHUB_STEP_SUMMARY
 
       - name: comment build names on pr
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request_target' }}
         run: gh pr comment ${{ github.event.number }} -R iccowan/AviationAPIv2 --create-if-none --edit-last -F $OUTPUT_FILE
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

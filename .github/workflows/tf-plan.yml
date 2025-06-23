@@ -3,14 +3,12 @@ name: terraform plan
 on:
   workflow_call:
     inputs:
+      ref:
+        required: true
+        type: string
       environment:
         required: true
         type: string
-    secrets:
-      TF_ROLE_ARN:
-        required: true
-      TF_BACKEND_ROLE_ARN:
-        required: true
 
 permissions:
   id-token: write
@@ -26,12 +24,14 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: setup aws credentials
         uses: ./.github/actions/setup-tf-aws-credentials-action
         with:
-          TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
-          TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
+          TF_ROLE_ARN: ${{ vars.TF_ROLE_ARN }}
+          TF_BACKEND_ROLE_ARN: ${{ vars.TF_BACKEND_ROLE_ARN }}
           AWS_REGION: ${{ vars.AWS_REGION }}
 
       - name: setup terraform
