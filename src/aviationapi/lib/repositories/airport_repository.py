@@ -29,7 +29,7 @@ def generate_key(airport):
 def get_airport(airport_name, airac, chart_type):
     airport_dict = _get(
         {
-            "unique_airport_id": airport_name,
+            "unique_airport_id": airport_name.upper(),
             "chart_type::airac": f"{chart_type}::{airac}",
         }
     )
