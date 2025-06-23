@@ -3,15 +3,15 @@ name: build frontend
 on:
   workflow_call:
     inputs:
+      ref:
+        required: true
+        type: string
       build-number:
         required: true
         type: string
     outputs:
       build-name:
         value: ${{ jobs.build-www.outputs.build-name }}
-    secrets:
-      BUILD_ROLE_ARN:
-        required: true
 
 permissions:
   id-token: write
@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: setup bun
         uses: oven-sh/setup-bun@v2
@@ -35,7 +37,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
-          role-to-assume: ${{ secrets.BUILD_ROLE_ARN }}
+          role-to-assume: ${{ vars.BUILD_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: build
