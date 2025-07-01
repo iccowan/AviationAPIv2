@@ -3,9 +3,6 @@ name: build frontend
 on:
   workflow_call:
     inputs:
-      ref:
-        required: true
-        type: string
       build-number:
         required: true
         type: string
@@ -26,8 +23,6 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.ref }}
 
       - name: setup bun
         uses: oven-sh/setup-bun@v2

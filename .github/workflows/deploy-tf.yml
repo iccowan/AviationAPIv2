@@ -18,7 +18,6 @@ jobs:
   plan:
     uses: iccowan/AviationAPIv2/.github/workflows/tf-plan.yml@main
     with:
-      ref: ${{ github.ref }}
       environment: ${{ inputs.environment }}
 
   approve:

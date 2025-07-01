@@ -7,83 +7,53 @@ on:
     branches:
       - main
 
-  pull_request_target:
+  pull_request:
     types: [opened, reopened, synchronize]
 
 env:
   BUILD_NUMBER: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
       
 jobs:
-  generate-ref:
-    runs-on: ubuntu-latest
-    outputs:
-      ref: ${{ steps.generate-ref.outputs.ref }}
-
-    steps:
-      - name: generate ref
-        id: generate-ref
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request_target" ]
-          then
-            echo "ref=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
-          fi
-
   validate-frontend:
     uses: iccowan/AviationAPIv2/.github/workflows/validate-www.yml@main
-    needs: generate-ref
-    with:
-      ref: ${{ needs.generate-ref.outputs.ref }}
 
   validate:
     uses: iccowan/AviationAPIv2/.github/workflows/validate.yml@main
-    needs: generate-ref
-    with:
-      ref: ${{ needs.generate-ref.outputs.ref }}
 
   validate-tf:
     uses: iccowan/AviationAPIv2/.github/workflows/validate-tf.yml@main
-    needs: generate-ref
-    with:
-      ref: ${{ needs.generate-ref.outputs.ref }}
 
   build-frontend:
     uses: iccowan/AviationAPIv2/.github/workflows/build-www.yml@main
-    needs: [validate-frontend, generate-ref]
+    needs: validate-frontend
     with:
-      ref: ${{ needs.generate-ref.outputs.ref }}
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
   build-api:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: [validate, generate-ref]
+    needs: validate
     with:
-      ref: ${{ needs.generate-ref.outputs.ref }}
       module-name: api
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
   build-chart-pre-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: [validate, generate-ref]
+    needs: validate
     with:
-      ref: ${{ needs.generate-ref.outputs.ref }}
       module-name: chart_pre_processor
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
   build-chart-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: [validate, generate-ref]
+    needs: validate
     with:
-      ref: ${{ needs.generate-ref.outputs.ref }}
       module-name: chart_processor
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
   build-chart-post-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: [validate, generate-ref]
+    needs: validate
     with:
-      ref: ${{ needs.generate-ref.outputs.ref }}
       module-name: chart_post_processor
       build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
