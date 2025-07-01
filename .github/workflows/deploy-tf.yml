@@ -8,7 +8,6 @@ on:
         type: choice
         options:
           - sandbox
-          - staging
           - prod
 
 permissions:

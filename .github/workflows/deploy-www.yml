@@ -7,7 +7,6 @@ on:
         type: choice
         options:
           - sandbox
-          - staging
           - prod
       build-name:
         required: true

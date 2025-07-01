@@ -12,11 +12,6 @@ jobs:
     with:
       environment: sandbox
 
-  staging:
-    uses: iccowan/AviationAPIv2/.github/workflows/tf-plan.yml@main
-    with:
-      environment: staging
-
   prod:
     uses: iccowan/AviationAPIv2/.github/workflows/tf-plan.yml@main
     with:
