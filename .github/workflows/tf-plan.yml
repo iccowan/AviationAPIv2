@@ -3,9 +3,6 @@ name: terraform plan
 on:
   workflow_call:
     inputs:
-      ref:
-        required: true
-        type: string
       environment:
         required: true
         type: string
@@ -24,8 +21,6 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.ref }}
 
       - name: setup aws credentials
         uses: ./.github/actions/setup-tf-aws-credentials-action

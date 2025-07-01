@@ -2,10 +2,6 @@ name: validate terraform
 
 on:
   workflow_call:
-    inputs:
-      ref:
-        required: true
-        type: string
 
 permissions:
   id-token: write
@@ -14,17 +10,9 @@ jobs:
   sandbox:
     uses: iccowan/AviationAPIv2/.github/workflows/tf-plan.yml@main
     with:
-      ref: ${{ inputs.ref }}
       environment: sandbox
-
-  staging:
-    uses: iccowan/AviationAPIv2/.github/workflows/tf-plan.yml@main
-    with:
-      ref: ${{ inputs.ref }}
-      environment: staging
 
   prod:
     uses: iccowan/AviationAPIv2/.github/workflows/tf-plan.yml@main
     with:
-      ref: ${{ inputs.ref }}
       environment: prod

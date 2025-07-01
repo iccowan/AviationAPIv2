@@ -3,9 +3,6 @@ name: build module
 on:
   workflow_call:
     inputs:
-      ref:
-        required: true
-        type: string
       module-name:
         required: true
         type: string
@@ -29,8 +26,6 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
-        with:
-          ref: "${{ inputs.ref }}"
 
       - name: setup python
         uses: actions/setup-python@v5
