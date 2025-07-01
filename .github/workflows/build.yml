@@ -14,52 +14,74 @@ env:
   BUILD_NUMBER: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
       
 jobs:
+  is-not-fork:
+    runs-on: ubuntu-latest
+    if: ${{ ! (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name) }}
+
+    steps:
+      - name: not a fork
+        run: echo "This has been detected to not be running on a fork. Validating and building..."
+
   validate-frontend:
+    if: always()
     uses: iccowan/AviationAPIv2/.github/workflows/validate-www.yml@main
 
   validate:
+    if: always()
     uses: iccowan/AviationAPIv2/.github/workflows/validate.yml@main
 
   validate-tf:
     uses: iccowan/AviationAPIv2/.github/workflows/validate-tf.yml@main
+    needs: is-not-fork
+
+  prepare-variables:
+    runs-on: ubuntu-latest
+    needs: is-not-fork
+    outputs:
+      build-number: ${{ steps.prepare-build-number.outputs.build-number }}
+
+    steps:
+      - name: prepare build number
+        id: prepare-build-number
+        run: echo "build-number=${{ env.BUILD_NUMBER }}" >> "$GITHUB_OUTPUT"
 
   build-frontend:
     uses: iccowan/AviationAPIv2/.github/workflows/build-www.yml@main
-    needs: validate-frontend
+    needs: [validate-frontend, is-not-fork, prepare-variables]
     with:
-      build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+      build-number: ${{ needs.prepare-variables.outputs.build-number }}
 
   build-api:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: validate
+    needs: [validate, is-not-fork, prepare-variables]
     with:
       module-name: api
-      build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+      build-number: ${{ needs.prepare-variables.outputs.build-number }}
 
   build-chart-pre-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: validate
+    needs: [validate, is-not-fork, prepare-variables]
     with:
       module-name: chart_pre_processor
-      build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+      build-number: ${{ needs.prepare-variables.outputs.build-number }}
 
   build-chart-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: validate
+    needs: [validate, is-not-fork, prepare-variables]
     with:
       module-name: chart_processor
-      build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+      build-number: ${{ needs.prepare-variables.outputs.build-number }}
 
   build-chart-post-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
-    needs: validate
+    needs: [validate, is-not-fork, prepare-variables]
     with:
       module-name: chart_post_processor
-      build-number: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+      build-number: ${{ needs.prepare-variables.outputs.build-number }}
 
   build-names-summary:
     runs-on: ubuntu-latest
-    needs: [build-frontend, build-api, build-chart-pre-processor, build-chart-processor, build-chart-post-processor]
+    needs: [build-frontend, build-api, build-chart-pre-processor, build-chart-processor, build-chart-post-processor, is-not-fork]
     env:
       OUTPUT_FILE: "output.md"
 
