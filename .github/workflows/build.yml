@@ -102,7 +102,7 @@ jobs:
         run: cat $OUTPUT_FILE >> $GITHUB_STEP_SUMMARY
 
       - name: comment build names on pr
-        if: ${{ github.event_name == 'pull_request_target' }}
+        if: ${{ github.event_name == 'pull_request' }}
         run: gh pr comment ${{ github.event.number }} -R iccowan/AviationAPIv2 --create-if-none --edit-last -F $OUTPUT_FILE
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
