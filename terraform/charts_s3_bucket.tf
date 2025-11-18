@@ -20,32 +20,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "aviationapi-charts-lifecycle" 
 resource "aws_s3_bucket_public_access_block" "aviationapi-charts-public-access" {
   bucket = aws_s3_bucket.aviationapi-charts.id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
-
-resource "aws_s3_bucket_policy" "aviationapi-charts-policy" {
-  bucket = aws_s3_bucket.aviationapi-charts.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Id      = "AllowGetObjects"
-    Statement = [
-      {
-        Sid       = "PublicReadGetObject"
-        Effect    = "Allow"
-        Principal = "*"
-        Action    = "s3:GetObject"
-        Resource  = "${aws_s3_bucket.aviationapi-charts.arn}/**"
-      }
-    ]
-  })
-
-  depends_on = [
-    aws_s3_bucket_public_access_block.aviationapi-charts-public-access
-  ]
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_acm_certificate" "aviationapi-charts-cert" {
@@ -61,10 +39,18 @@ locals {
   s3_origin_id = "${aws_s3_bucket.aviationapi-charts.bucket}-origin"
 }
 
+resource "aws_cloudfront_origin_access_control" "aviationapi-charts-cloudfront-oac" {
+  name                              = "aviationapi-charts-cloudfront-oac"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
 resource "aws_cloudfront_distribution" "aviationapi-charts-cloudfront" {
   origin {
-    domain_name = aws_s3_bucket.aviationapi-charts.bucket_regional_domain_name
-    origin_id   = local.s3_origin_id
+    domain_name              = aws_s3_bucket.aviationapi-charts.bucket_regional_domain_name
+    origin_access_control_id = aws_cloudfront_origin_access_control.aviationapi-charts-cloudfront-oac.id
+    origin_id                = local.s3_origin_id
   }
 
   enabled         = true
@@ -100,4 +86,29 @@ resource "aws_cloudfront_distribution" "aviationapi-charts-cloudfront" {
     acm_certificate_arn = aws_acm_certificate.aviationapi-charts-cert.arn
     ssl_support_method  = "sni-only"
   }
+}
+
+resource "aws_s3_bucket_policy" "aviationapi-charts-policy" {
+  bucket = aws_s3_bucket.aviationapi-charts.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "AllowGetObjects"
+    Statement = [
+      {
+        Sid    = "AllowCloudFrontServicePrincipalReadOnly"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
+        Action   = "s3:GetObject"
+        Resource = "${aws_s3_bucket.aviationapi-charts.arn}/*"
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = "${aws_cloudfront_distribution.aviationapi-charts-cloudfront.arn}"
+          }
+        }
+      }
+    ]
+  })
 }
