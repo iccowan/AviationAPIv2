@@ -30,13 +30,31 @@ def get_current_charts_for_airport(airport):
     return _get_charts_for_airport(airport, "current")
 
 
+def get_current_charts_for_airport_list(airport_list):
+    return [get_current_charts_for_airport(airport) for airport in airport_list]
+
+
 def get_next_charts_for_airport(airport):
     return _get_charts_for_airport(airport, "next")
+
+
+def get_next_charts_for_airport_list(airport_list):
+    return [get_next_charts_for_airport(airport) for airport in airport_list]
 
 
 def get_current_chart_supplement_for_airport(airport):
     return _get_chart_supplement_for_airport(airport, "current")
 
 
+def get_current_chart_supplement_for_airport_list(airport_list):
+    return [
+        get_current_chart_supplement_for_airport(airport) for airport in airport_list
+    ]
+
+
 def get_next_chart_supplement_for_airport(airport):
     return _get_chart_supplement_for_airport(airport, "next")
+
+
+def get_next_chart_supplement_for_airport_list(airport_list):
+    return [get_next_chart_supplement_for_airport(airport) for airport in airport_list]

@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Query
 
 import aviationapi.api.app.lib.collectors.airac_data_collector as AiracDataCollector
 import aviationapi.api.app.lib.collectors.airport_collector as AirportCollector
@@ -14,12 +16,28 @@ async def charts(airport: str, airac: int = 0):
     return AirportCollector.get_current_charts_for_airport(airport)
 
 
+@router.get("/many")
+async def charts(airport: Annotated[list[str], Query()] = [], airac: int = 0):
+    if airac == 1:
+        return AirportCollector.get_next_charts_for_airport_list(airport)
+
+    return AirportCollector.get_current_charts_for_airport_list(airport)
+
+
 @router.get("/chart-supplement")
 async def chart_supplement(airport: str, airac: int = 0):
     if airac == 1:
         return AirportCollector.get_next_chart_supplement_for_airport(airport)
 
     return AirportCollector.get_current_chart_supplement_for_airport(airport)
+
+
+@router.get("/chart-supplement/many")
+async def chart_supplement(airport: Annotated[list[str], Query()] = [], airac: int = 0):
+    if airac == 1:
+        return AirportCollector.get_next_chart_supplement_for_airport_list(airport)
+
+    return AirportCollector.get_current_chart_supplement_for_airport_list(airport)
 
 
 @router.get("/available")
