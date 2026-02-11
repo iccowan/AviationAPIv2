@@ -2,6 +2,11 @@ name: validate terraform
 
 on:
   workflow_call:
+    secrets:
+      TF_ROLE_ARN:
+        required: true
+      TF_BACKEND_ROLE_ARN:
+        required: true
 
 permissions:
   id-token: write
@@ -11,8 +16,14 @@ jobs:
     uses: iccowan/AviationAPIv2/.github/workflows/tf-plan.yml@main
     with:
       environment: sandbox
+    secrets:
+      TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
+      TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
 
   prod:
     uses: iccowan/AviationAPIv2/.github/workflows/tf-plan.yml@main
     with:
       environment: prod
+    secrets:
+      TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
+      TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
