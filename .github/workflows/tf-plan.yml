@@ -6,6 +6,11 @@ on:
       environment:
         required: true
         type: string
+    secrets:
+      TF_ROLE_ARN:
+        required: true
+      TF_BACKEND_ROLE_ARN:
+        required: true
 
 permissions:
   id-token: write
@@ -25,8 +30,8 @@ jobs:
       - name: setup aws credentials
         uses: ./.github/actions/setup-tf-aws-credentials-action
         with:
-          TF_ROLE_ARN: ${{ vars.TF_ROLE_ARN }}
-          TF_BACKEND_ROLE_ARN: ${{ vars.TF_BACKEND_ROLE_ARN }}
+          TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
+          TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
           AWS_REGION: ${{ vars.AWS_REGION }}
 
       - name: setup terraform

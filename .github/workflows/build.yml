@@ -33,6 +33,9 @@ jobs:
   validate-tf:
     uses: iccowan/AviationAPIv2/.github/workflows/validate-tf.yml@main
     needs: is-not-fork
+    secrets:
+      TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
+      TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
 
   prepare-variables:
     runs-on: ubuntu-latest
@@ -50,6 +53,8 @@ jobs:
     needs: [validate-frontend, is-not-fork, prepare-variables]
     with:
       build-number: ${{ needs.prepare-variables.outputs.build-number }}
+    secrets:
+      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-api:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
@@ -57,6 +62,8 @@ jobs:
     with:
       module-name: api
       build-number: ${{ needs.prepare-variables.outputs.build-number }}
+    secrets:
+      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-chart-pre-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
@@ -64,6 +71,8 @@ jobs:
     with:
       module-name: chart_pre_processor
       build-number: ${{ needs.prepare-variables.outputs.build-number }}
+    secrets:
+      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-chart-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
@@ -71,6 +80,8 @@ jobs:
     with:
       module-name: chart_processor
       build-number: ${{ needs.prepare-variables.outputs.build-number }}
+    secrets:
+      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-chart-post-processor:
     uses: iccowan/AviationAPIv2/.github/workflows/build-module.yml@main
@@ -78,6 +89,8 @@ jobs:
     with:
       module-name: chart_post_processor
       build-number: ${{ needs.prepare-variables.outputs.build-number }}
+    secrets:
+      BUILD_ROLE_ARN: ${{ secrets.BUILD_ROLE_ARN }}
 
   build-names-summary:
     runs-on: ubuntu-latest
