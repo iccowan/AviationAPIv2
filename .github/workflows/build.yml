@@ -129,6 +129,7 @@ jobs:
     steps:
       - name: trigger deploy to prod
         run: |
+          gh workflow run deploy-www.yml -R iccowan/AviationAPIv2 -r main -f environment=prod -f build-name=${{ needs.build-frontend.outputs.build-name }}
           gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=prod -f build-name=${{ needs.build-api.outputs.build-name }}
           gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=prod -f build-name=${{ needs.build-chart-pre-processor.outputs.build-name }}
           gh workflow run deploy.yml -R iccowan/AviationAPIv2 -r main -f environment=prod -f build-name=${{ needs.build-chart-processor.outputs.build-name }}
