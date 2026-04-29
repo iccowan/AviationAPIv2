@@ -1,6 +1,8 @@
 from datetime import datetime
 from enum import Enum
 
+from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
+
 
 class Packets(Enum):
     A = "A"
@@ -27,13 +29,15 @@ class AiracData:
     def __init__(
         self,
         airac="",
+        source=DEFAULT_CHART_SOURCE,
         cycle_type=CycleTypes.CURRENT.value,
         cycle_chart_type=CycleChartTypes.CHARTS.value,
         valid_date=None,
         is_retrieveable=False,
-        airac_data_dict={},
+        airac_data_dict=None,
     ):
         self.airac = airac
+        self.source = source
         self.cycle_type = cycle_type
         self.cycle_chart_type = cycle_chart_type
         self.valid_date = valid_date
@@ -49,6 +53,9 @@ class AiracData:
 
         if cycle_chart_type == CycleChartTypes.CHART_SUPPLEMENT.value:
             self.is_packet_processed = {Packets.CHART_SUPPLEMENT.value: False}
+
+        if airac_data_dict is None:
+            airac_data_dict = {}
 
         for k, v in airac_data_dict.items():
             if k == "valid_date":
