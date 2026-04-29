@@ -7,6 +7,10 @@ def get_provider(source):
     return PROVIDERS.get(source)
 
 
+def get_providers():
+    return list(PROVIDERS.values())
+
+
 def get_expected_jobs(source, cycle_chart_type):
     provider = get_provider(source)
     if provider is None:
