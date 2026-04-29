@@ -22,6 +22,7 @@ def test_lambda_handler_calls_process_standard_chart_packets_when_packet_abcd(
     lambda_handler(event, context)
 
     process_standard_chart_packets.assert_called_once_with(packet, airac)
+    publish_success_message.assert_called_once_with(airac, packet, "charts", "faa_tpp")
 
 
 """
@@ -167,7 +168,7 @@ def set_env(env):
     reload(app.chart_processor)
 
 
-def generate_handler_event(packet, airac):
+def generate_handler_event(packet, airac, source="faa_tpp"):
     return {
         "Records": [
             {
@@ -175,6 +176,7 @@ def generate_handler_event(packet, airac):
                     "MessageAttributes": {
                         "packet": {"Type": "S", "Value": packet},
                         "airac": {"Type": "S", "Value": airac},
+                        "source": {"Type": "S", "Value": source},
                     }
                 }
             }

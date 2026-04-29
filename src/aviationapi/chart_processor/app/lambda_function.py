@@ -12,6 +12,7 @@ from pypdf import PdfReader, PdfWriter
 import aviationapi.chart_processor.app.airport_codes as AirportCodes
 import aviationapi.chart_processor.app.format_chart_db_data as ChartDataFormatter
 import aviationapi.chart_processor.app.format_cs_db_data as ChartSupplementDataFormatter
+from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
 import aviationapi.lib.messengers.trigger_chart_post_processor as TriggerChartPostProcessorMessenger
 from aviationapi.lib.logger import logInfo
 from aviationapi.lib.models.AiracData import CycleChartTypes
@@ -260,9 +261,10 @@ def lambda_handler(event, context):
     attributes = event["Records"][0]["Sns"]["MessageAttributes"]
     packet = attributes["packet"]["Value"]
     airac = attributes["airac"]["Value"]
+    source = attributes.get("source", {}).get("Value", DEFAULT_CHART_SOURCE)
     cycle_chart_type = CycleChartTypes.CHARTS.value
 
-    logInfo(f"packet: {packet}, airac: {airac}")
+    logInfo(f"source: {source}, packet: {packet}, airac: {airac}")
     success = True
 
     match packet:
@@ -279,14 +281,16 @@ def lambda_handler(event, context):
 
     if success:
         logInfo(
-            f"Sending success message to post processor for {cycle_chart_type} packet {packet} airac {airac}"
+            f"Sending success message to post processor for source {source} "
+            f"{cycle_chart_type} packet {packet} airac {airac}"
         )
         TriggerChartPostProcessorMessenger.publish_success_message(
-            airac, packet, cycle_chart_type
+            airac, packet, cycle_chart_type, source
         )
     else:
         logInfo(
-            f"Error processing {cycle_chart_type} packet {packet} airac {airac}. Success message not sent"
+            f"Error processing source {source} {cycle_chart_type} packet {packet} "
+            f"airac {airac}. Success message not sent"
         )
 
     logInfo("Cleaning up drive")
