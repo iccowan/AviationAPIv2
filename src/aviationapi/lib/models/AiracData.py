@@ -4,15 +4,6 @@ from enum import Enum
 from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
 
 
-class Packets(Enum):
-    A = "A"
-    B = "B"
-    C = "C"
-    D = "D"
-    E = "E"
-    CHART_SUPPLEMENT = "ChartSupplement"
-
-
 class CycleTypes(Enum):
     CURRENT = "current"
     NEXT = "next"
@@ -26,6 +17,13 @@ class CycleChartTypes(Enum):
 class AiracData:
     VALID_DATE_FORMAT = "%Y-%m-%d"
 
+    @staticmethod
+    def create_packet_processing_state(expected_jobs=None):
+        if expected_jobs is None:
+            expected_jobs = []
+
+        return {job: False for job in expected_jobs}
+
     def __init__(
         self,
         airac="",
@@ -34,6 +32,7 @@ class AiracData:
         cycle_chart_type=CycleChartTypes.CHARTS.value,
         valid_date=None,
         is_retrieveable=False,
+        expected_jobs=None,
         airac_data_dict=None,
     ):
         self.airac = airac
@@ -43,16 +42,9 @@ class AiracData:
         self.valid_date = valid_date
         self.is_retrieveable = is_retrieveable
 
-        self.is_packet_processed = {
-            Packets.A.value: False,
-            Packets.B.value: False,
-            Packets.C.value: False,
-            Packets.D.value: False,
-            Packets.E.value: False,
-        }
-
-        if cycle_chart_type == CycleChartTypes.CHART_SUPPLEMENT.value:
-            self.is_packet_processed = {Packets.CHART_SUPPLEMENT.value: False}
+        self.is_packet_processed = AiracData.create_packet_processing_state(
+            expected_jobs
+        )
 
         if airac_data_dict is None:
             airac_data_dict = {}

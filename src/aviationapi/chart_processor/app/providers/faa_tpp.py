@@ -254,6 +254,12 @@ def process_chart_supplement(packet, airac):
 class FaaTppChartProvider(ChartProvider):
     source = DEFAULT_CHART_SOURCE
 
+    def get_expected_jobs(self, cycle_chart_type):
+        if cycle_chart_type == CycleChartTypes.CHART_SUPPLEMENT.value:
+            return ["ChartSupplement"]
+
+        return ["A", "B", "C", "D", "E"]
+
     def process_packet(self, packet, airac):
         cycle_chart_type = CycleChartTypes.CHARTS.value
         success = True

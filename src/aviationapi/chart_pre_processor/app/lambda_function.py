@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from aviationapi.chart_processor.app.providers.registry import get_expected_jobs
 from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
 import aviationapi.lib.messengers.trigger_chart_processor as TriggerChartProcessorMessenger
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
@@ -44,6 +45,19 @@ def deduce_current_next_airac():
     }
 
 
+def create_airac_data(
+    airac, cycle_type, cycle_chart_type, valid_date, source=CHART_SOURCE
+):
+    return AiracData(
+        airac=airac,
+        source=source,
+        cycle_type=cycle_type,
+        cycle_chart_type=cycle_chart_type,
+        valid_date=valid_date,
+        expected_jobs=get_expected_jobs(source, cycle_chart_type),
+    )
+
+
 def get_current_airacs():
     logInfo("Pulling airac data from DynamoDB")
 
@@ -74,30 +88,26 @@ def get_current_airacs():
 
         current_airacs = deduce_current_next_airac()
 
-        current_charts_airac = AiracData(
+        current_charts_airac = create_airac_data(
             airac=date_to_airac(current_airacs["current_charts_airac"]),
-            source=CHART_SOURCE,
             cycle_type=CycleTypes.CURRENT.value,
             cycle_chart_type=CycleChartTypes.CHARTS.value,
             valid_date=current_airacs["current_charts_airac"],
         )
-        next_charts_airac = AiracData(
+        next_charts_airac = create_airac_data(
             airac=date_to_airac(current_airacs["next_charts_airac"]),
-            source=CHART_SOURCE,
             cycle_type=CycleTypes.NEXT.value,
             cycle_chart_type=CycleChartTypes.CHARTS.value,
             valid_date=current_airacs["next_charts_airac"],
         )
-        current_supplement_airac = AiracData(
+        current_supplement_airac = create_airac_data(
             airac=date_to_airac(current_airacs["current_supplement_airac"]),
-            source=CHART_SOURCE,
             cycle_type=CycleTypes.CURRENT.value,
             cycle_chart_type=CycleChartTypes.CHART_SUPPLEMENT.value,
             valid_date=current_airacs["current_supplement_airac"],
         )
-        next_supplement_airac = AiracData(
+        next_supplement_airac = create_airac_data(
             airac=date_to_airac(current_airacs["next_supplement_airac"]),
-            source=CHART_SOURCE,
             cycle_type=CycleTypes.NEXT.value,
             cycle_chart_type=CycleChartTypes.CHART_SUPPLEMENT.value,
             valid_date=current_airacs["next_supplement_airac"],
@@ -142,9 +152,8 @@ def update_airac(current_airacs, chart_type):
             days=cycle_days
         )
 
-        current_airacs[next_key] = AiracData(
+        current_airacs[next_key] = create_airac_data(
             airac=date_to_airac(next_valid_date),
-            source=CHART_SOURCE,
             cycle_type=CycleTypes.NEXT.value,
             cycle_chart_type=chart_type,
             valid_date=next_valid_date,

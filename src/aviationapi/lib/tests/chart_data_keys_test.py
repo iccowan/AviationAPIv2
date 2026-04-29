@@ -38,3 +38,9 @@ def test_airac_data_defaults_source_to_faa():
     airac_data = AiracData()
 
     assert airac_data.source == DEFAULT_CHART_SOURCE
+
+
+def test_airac_data_initializes_processing_state_from_expected_jobs():
+    airac_data = AiracData(expected_jobs=["job_a", "job_b"])
+
+    assert airac_data.is_packet_processed == {"job_a": False, "job_b": False}
