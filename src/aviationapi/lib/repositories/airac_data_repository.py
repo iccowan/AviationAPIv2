@@ -21,9 +21,8 @@ def _normalize_airac_dict(airac_dict):
     )
     normalized_airac_dict["provider"] = normalized_airac_dict.get(
         "provider",
-        normalized_airac_dict.get("source", parsed_cycle_chart_type["provider"]),
+        parsed_cycle_chart_type["provider"],
     )
-    normalized_airac_dict.pop("source", None)
     normalized_airac_dict["cycle_chart_type"] = parsed_cycle_chart_type[
         "cycle_chart_type"
     ]

@@ -32,19 +32,6 @@ def test_get_airport_falls_back_to_legacy_default_provider(mock_get):
     assert airport.provider == DEFAULT_CHART_PROVIDER
 
 
-@patch("aviationapi.lib.repositories.airport_repository._get")
-def test_get_airport_reads_old_source_field_as_provider(mock_get):
-    mock_get.return_value = {
-        "source": "faa_tpp",
-        "airport_data": {"icao_ident": "KJFK"},
-        "charts": {},
-    }
-
-    airport = AirportRepository.get_airport("KJFK", "250417", "tpp", provider="faa_tpp")
-
-    assert airport.provider == "faa_tpp"
-
-
 @patch("aviationapi.lib.repositories.airac_data_repository._put")
 def test_put_airac_encodes_provider_into_storage_key(mock_put):
     airac_data = AiracData(
@@ -80,25 +67,6 @@ def test_get_airac_falls_back_to_legacy_default_provider(mock_get):
     assert mock_get.call_count == 2
     assert airac_data.provider == DEFAULT_CHART_PROVIDER
     assert airac_data.cycle_chart_type == CycleChartTypes.CHARTS.value
-
-
-@patch("aviationapi.lib.repositories.airac_data_repository._get")
-def test_get_airac_reads_old_source_field_as_provider(mock_get):
-    mock_get.return_value = {
-        "airac": "250417",
-        "source": "faa_tpp",
-        "cycle_type": "current",
-        "cycle_chart_type": "faa_tpp::charts",
-        "valid_date": "2025-04-17",
-        "is_retrieveable": False,
-        "is_packet_processed": {},
-    }
-
-    airac_data = AiracDataRepository.get_airac(
-        "current", CycleChartTypes.CHARTS.value, provider="faa_tpp"
-    )
-
-    assert airac_data.provider == "faa_tpp"
 
 
 @patch("aviationapi.lib.repositories.airac_data_repository._query")

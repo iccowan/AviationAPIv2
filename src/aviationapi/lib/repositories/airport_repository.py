@@ -82,9 +82,7 @@ def get_airport(airport_name, airac, chart_type, provider=DEFAULT_CHART_PROVIDER
     else:
         airport = Airport(airac, airport_dict)
 
-    airport.provider = airport_dict.get(
-        "provider", airport_dict.get("source", provider)
-    )
+    airport.provider = airport_dict.get("provider", provider)
 
     return airport
 
