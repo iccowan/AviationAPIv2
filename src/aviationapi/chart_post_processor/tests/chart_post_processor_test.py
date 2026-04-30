@@ -25,7 +25,9 @@ def generate_handler_event(packet, airac, cycle_chart_type, source):
     }
 
 
-@patch("aviationapi.chart_post_processor.app.lambda_function.AiracDataRepository.put_airac")
+@patch(
+    "aviationapi.chart_post_processor.app.lambda_function.AiracDataRepository.put_airac"
+)
 @patch(
     "aviationapi.chart_post_processor.app.lambda_function.AiracDataRepository.get_airac_by_cycle_chart_type_and_airac"
 )
@@ -38,7 +40,9 @@ def test_lambda_handler_uses_source_aware_airac_lookup(mock_get_airac, mock_put_
         valid_date=datetime(2025, 4, 17),
     )
 
-    event = generate_handler_event("A", "250417", CycleChartTypes.CHARTS.value, "faa_tpp")
+    event = generate_handler_event(
+        "A", "250417", CycleChartTypes.CHARTS.value, "faa_tpp"
+    )
 
     lambda_handler(event, {})
 

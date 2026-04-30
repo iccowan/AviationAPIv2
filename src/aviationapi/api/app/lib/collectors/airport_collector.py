@@ -1,7 +1,7 @@
-from aviationapi.chart_processor.app.providers.registry import get_providers
-from aviationapi.lib.logger import logError
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
 import aviationapi.lib.repositories.airport_repository as AirportRepository
+from aviationapi.chart_processor.app.providers.registry import get_providers
+from aviationapi.lib.logger import logError
 
 
 def _get_airport_chart_type(chart_type):

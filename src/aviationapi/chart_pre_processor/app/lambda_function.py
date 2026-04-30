@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 
-from aviationapi.chart_processor.app.providers.registry import get_expected_jobs
-from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
 import aviationapi.lib.messengers.trigger_chart_processor as TriggerChartProcessorMessenger
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
+from aviationapi.chart_processor.app.providers.registry import get_expected_jobs
+from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
 from aviationapi.lib.logger import logInfo
 from aviationapi.lib.models.AiracData import AiracData, CycleChartTypes, CycleTypes
 

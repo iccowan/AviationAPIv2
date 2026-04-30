@@ -37,7 +37,9 @@ def _build_airac_lookup_keys(cycle_type, cycle_chart_type, source):
     lookup_keys = [
         {
             "cycle_type": cycle_type,
-            "cycle_chart_type": _build_storage_cycle_chart_type(source, cycle_chart_type),
+            "cycle_chart_type": _build_storage_cycle_chart_type(
+                source, cycle_chart_type
+            ),
         }
     ]
 

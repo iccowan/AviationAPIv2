@@ -36,3 +36,21 @@ def test_get_current_availability_aggregates_all_sources(
     availability = AiracDataCollector.get_current_availability()
 
     assert [item["source"] for item in availability] == ["faa_tpp", "faa_tpp", "uk_aip"]
+
+
+@patch(
+    "aviationapi.api.app.lib.collectors.airac_data_collector.AiracDataRepository.get_all_airac"
+)
+@patch("aviationapi.api.app.lib.collectors.airac_data_collector.get_providers")
+def test_get_current_availability_returns_single_item_as_dict(
+    mock_get_providers, mock_get_all_airac
+):
+    mock_get_providers.return_value = [Mock(source="faa_tpp")]
+    mock_get_all_airac.return_value = _build_airac(
+        "faa_tpp", CycleChartTypes.CHARTS.value
+    )
+
+    availability = AiracDataCollector.get_current_availability()
+
+    assert availability["source"] == "faa_tpp"
+    assert availability["cycle_chart_type"] == CycleChartTypes.CHARTS.value

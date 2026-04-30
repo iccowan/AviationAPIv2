@@ -1,9 +1,9 @@
 import shutil
 
+import aviationapi.lib.messengers.trigger_chart_post_processor as TriggerChartPostProcessorMessenger
 from aviationapi.chart_processor.app.providers.faa_tpp import DOWNLOAD_PATH
 from aviationapi.chart_processor.app.providers.registry import get_provider
 from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
-import aviationapi.lib.messengers.trigger_chart_post_processor as TriggerChartPostProcessorMessenger
 from aviationapi.lib.logger import logError, logInfo
 
 

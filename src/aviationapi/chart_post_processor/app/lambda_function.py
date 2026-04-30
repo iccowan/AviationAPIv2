@@ -1,5 +1,5 @@
-from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
+from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
 from aviationapi.lib.logger import logError, logInfo
 
 

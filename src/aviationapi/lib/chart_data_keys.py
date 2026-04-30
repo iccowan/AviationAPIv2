@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 KEY_DELIMITER = "::"
 
 

@@ -1,5 +1,5 @@
-from aviationapi.chart_processor.app.providers.registry import get_providers
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
+from aviationapi.chart_processor.app.providers.registry import get_providers
 
 
 def _get_availability(cycle_chart_type):
@@ -21,6 +21,9 @@ def _get_availability(cycle_chart_type):
         return None
 
     availability.sort(key=lambda airac: (airac["source"], airac["cycle_chart_type"]))
+
+    if len(availability) == 1:
+        return availability[0]
 
     return availability
 

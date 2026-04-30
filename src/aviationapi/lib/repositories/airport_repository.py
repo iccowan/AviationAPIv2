@@ -3,10 +3,7 @@ from datetime import datetime, timedelta
 
 import boto3
 
-from aviationapi.lib.chart_data_keys import (
-    DEFAULT_CHART_SOURCE,
-    build_airport_data_key,
-)
+from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE, build_airport_data_key
 from aviationapi.lib.models.Airport import Airport
 from aviationapi.lib.models.AirportChartSupplement import AirportChartSupplement
 
@@ -58,14 +55,18 @@ def _build_airport_lookup_keys(airport_name, airac, chart_type, source):
     lookup_keys = [_build_airport_key(unique_airport_id, chart_type, airac, source)]
 
     if source == DEFAULT_CHART_SOURCE:
-        lookup_keys.append(_get_legacy_airport_key(unique_airport_id, chart_type, airac))
+        lookup_keys.append(
+            _get_legacy_airport_key(unique_airport_id, chart_type, airac)
+        )
 
     return lookup_keys
 
 
 def get_airport(airport_name, airac, chart_type, source=DEFAULT_CHART_SOURCE):
     airport_dict = None
-    for lookup_key in _build_airport_lookup_keys(airport_name, airac, chart_type, source):
+    for lookup_key in _build_airport_lookup_keys(
+        airport_name, airac, chart_type, source
+    ):
         airport_dict = _get(lookup_key)
         if airport_dict is not None:
             break
