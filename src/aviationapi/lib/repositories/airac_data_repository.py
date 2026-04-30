@@ -3,10 +3,10 @@ import os
 import boto3
 from boto3.dynamodb.conditions import Key
 
-from aviationapi.lib.chart_data_keys import (
-    DEFAULT_CHART_SOURCE,
-    build_source_cycle_chart_type,
-    parse_source_cycle_chart_type,
+from aviationapi.lib.chart_provider_keys import (
+    DEFAULT_CHART_PROVIDER,
+    build_provider_cycle_chart_type,
+    parse_provider_cycle_chart_type,
 )
 from aviationapi.lib.models.AiracData import AiracData
 
@@ -16,12 +16,14 @@ TABLE = boto3.resource("dynamodb").Table(TABLE_NAME)
 
 def _normalize_airac_dict(airac_dict):
     normalized_airac_dict = airac_dict.copy()
-    parsed_cycle_chart_type = parse_source_cycle_chart_type(
+    parsed_cycle_chart_type = parse_provider_cycle_chart_type(
         normalized_airac_dict["cycle_chart_type"]
     )
-    normalized_airac_dict["source"] = normalized_airac_dict.get(
-        "source", parsed_cycle_chart_type["source"]
+    normalized_airac_dict["provider"] = normalized_airac_dict.get(
+        "provider",
+        normalized_airac_dict.get("source", parsed_cycle_chart_type["provider"]),
     )
+    normalized_airac_dict.pop("source", None)
     normalized_airac_dict["cycle_chart_type"] = parsed_cycle_chart_type[
         "cycle_chart_type"
     ]
@@ -29,21 +31,21 @@ def _normalize_airac_dict(airac_dict):
     return normalized_airac_dict
 
 
-def _build_storage_cycle_chart_type(source, cycle_chart_type):
-    return build_source_cycle_chart_type(source, cycle_chart_type)
+def _build_storage_cycle_chart_type(provider, cycle_chart_type):
+    return build_provider_cycle_chart_type(provider, cycle_chart_type)
 
 
-def _build_airac_lookup_keys(cycle_type, cycle_chart_type, source):
+def _build_airac_lookup_keys(cycle_type, cycle_chart_type, provider):
     lookup_keys = [
         {
             "cycle_type": cycle_type,
             "cycle_chart_type": _build_storage_cycle_chart_type(
-                source, cycle_chart_type
+                provider, cycle_chart_type
             ),
         }
     ]
 
-    if source == DEFAULT_CHART_SOURCE:
+    if provider == DEFAULT_CHART_PROVIDER:
         lookup_keys.append(
             {"cycle_type": cycle_type, "cycle_chart_type": cycle_chart_type}
         )
@@ -51,10 +53,10 @@ def _build_airac_lookup_keys(cycle_type, cycle_chart_type, source):
     return lookup_keys
 
 
-def _build_airac_query_cycle_chart_types(cycle_chart_type, source):
-    cycle_chart_types = [_build_storage_cycle_chart_type(source, cycle_chart_type)]
+def _build_airac_query_cycle_chart_types(cycle_chart_type, provider):
+    cycle_chart_types = [_build_storage_cycle_chart_type(provider, cycle_chart_type)]
 
-    if source == DEFAULT_CHART_SOURCE:
+    if provider == DEFAULT_CHART_PROVIDER:
         cycle_chart_types.append(cycle_chart_type)
 
     return cycle_chart_types
@@ -67,8 +69,8 @@ def _to_airac_data(airac_dict):
     return AiracData(airac_data_dict=_normalize_airac_dict(airac_dict))
 
 
-def _matches_source(airac_dict, source):
-    return _normalize_airac_dict(airac_dict)["source"] == source
+def _matches_provider(airac_dict, provider):
+    return _normalize_airac_dict(airac_dict)["provider"] == provider
 
 
 def _is_source_aware_airac_dict(airac_dict):
@@ -78,10 +80,10 @@ def _is_source_aware_airac_dict(airac_dict):
 def get_airac(
     cycle_type="next",
     cycle_chart_type="charts",
-    source=DEFAULT_CHART_SOURCE,
+    provider=DEFAULT_CHART_PROVIDER,
 ):
     airac_dict = None
-    for lookup_key in _build_airac_lookup_keys(cycle_type, cycle_chart_type, source):
+    for lookup_key in _build_airac_lookup_keys(cycle_type, cycle_chart_type, provider):
         airac_dict = _get(lookup_key)
         if airac_dict is not None:
             break
@@ -95,11 +97,11 @@ def get_airac(
 def get_airac_by_cycle_chart_type_and_airac(
     airac,
     cycle_chart_type,
-    source=DEFAULT_CHART_SOURCE,
+    provider=DEFAULT_CHART_PROVIDER,
 ):
     airac_dict = None
     for query_cycle_chart_type in _build_airac_query_cycle_chart_types(
-        cycle_chart_type, source
+        cycle_chart_type, provider
     ):
         airac_dict = _get_airac_by_airac_name_and_chart_type(
             {"airac": airac, "cycle_chart_type": query_cycle_chart_type}
@@ -113,7 +115,7 @@ def get_airac_by_cycle_chart_type_and_airac(
     return _to_airac_data(airac_dict)
 
 
-def get_all_airac(cycle_type, source=DEFAULT_CHART_SOURCE):
+def get_all_airac(cycle_type, provider=DEFAULT_CHART_PROVIDER):
     airac_data_list = _query({"cycle_type": cycle_type})
 
     if airac_data_list is None:
@@ -124,7 +126,7 @@ def get_all_airac(cycle_type, source=DEFAULT_CHART_SOURCE):
 
     selected_airac_data = {}
     for airac_data in airac_data_list:
-        if not _matches_source(airac_data, source):
+        if not _matches_provider(airac_data, provider):
             continue
 
         normalized_airac_dict = _normalize_airac_dict(airac_data)
@@ -153,7 +155,7 @@ def get_all_airac(cycle_type, source=DEFAULT_CHART_SOURCE):
 def put_airac(airac):
     airac_dict = airac.dict()
     airac_dict["cycle_chart_type"] = _build_storage_cycle_chart_type(
-        airac.source, airac.cycle_chart_type
+        airac.provider, airac.cycle_chart_type
     )
     _put(airac_dict)
 
@@ -163,7 +165,7 @@ def delete_airac(airac):
         {
             "cycle_type": airac.cycle_type,
             "cycle_chart_type": _build_storage_cycle_chart_type(
-                airac.source, airac.cycle_chart_type
+                airac.provider, airac.cycle_chart_type
             ),
         }
     )

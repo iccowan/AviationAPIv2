@@ -12,9 +12,9 @@ def _get_airport_chart_type(chart_type):
     return airport_chart_type
 
 
-def _get_airport_from_source(airport, chart_cycle_type, chart_type, source):
+def _get_airport_from_provider(airport, chart_cycle_type, chart_type, provider):
     airac_data = AiracDataRepository.get_airac(
-        chart_cycle_type, chart_type, source=source
+        chart_cycle_type, chart_type, provider=provider
     )
     if airac_data is None or not airac_data.is_retrieveable:
         return None
@@ -23,7 +23,7 @@ def _get_airport_from_source(airport, chart_cycle_type, chart_type, source):
         airport,
         airac_data.airac,
         _get_airport_chart_type(chart_type),
-        source=source,
+        provider=provider,
     )
     if charts is None:
         return None
@@ -32,26 +32,27 @@ def _get_airport_from_source(airport, chart_cycle_type, chart_type, source):
 
 
 def _get_airport(airport, chart_cycle_type, chart_type):
-    source_matches = []
+    provider_matches = []
     for provider in get_providers():
-        charts = _get_airport_from_source(
-            airport, chart_cycle_type, chart_type, provider.source
+        charts = _get_airport_from_provider(
+            airport, chart_cycle_type, chart_type, provider.provider
         )
         if charts is None:
             continue
 
-        source_matches.append({"source": provider.source, "charts": charts})
+        provider_matches.append({"provider": provider.provider, "charts": charts})
 
-    if len(source_matches) == 0:
+    if len(provider_matches) == 0:
         return {}
 
-    if len(source_matches) > 1:
-        matched_sources = ", ".join([match["source"] for match in source_matches])
+    if len(provider_matches) > 1:
+        matched_providers = ", ".join([match["provider"] for match in provider_matches])
         logError(
-            f"Airport {airport} matched multiple sources for {chart_type}: {matched_sources}"
+            f"Airport {airport} matched multiple providers "
+            f"for {chart_type}: {matched_providers}"
         )
 
-    return source_matches[0]["charts"]
+    return provider_matches[0]["charts"]
 
 
 def _get_charts_for_airport(airport, chart_type):

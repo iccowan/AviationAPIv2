@@ -6,7 +6,7 @@ def _get_availability(cycle_chart_type):
     availability = []
     for provider in get_providers():
         airac_data = AiracDataRepository.get_all_airac(
-            cycle_chart_type, source=provider.source
+            cycle_chart_type, provider=provider.provider
         )
         if airac_data is None:
             continue
@@ -20,7 +20,7 @@ def _get_availability(cycle_chart_type):
     if len(availability) == 0:
         return None
 
-    availability.sort(key=lambda airac: (airac["source"], airac["cycle_chart_type"]))
+    availability.sort(key=lambda airac: (airac["provider"], airac["cycle_chart_type"]))
 
     if len(availability) == 1:
         return availability[0]

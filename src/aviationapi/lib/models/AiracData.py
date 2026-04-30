@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
+from aviationapi.lib.chart_provider_keys import DEFAULT_CHART_PROVIDER
 
 
 class CycleTypes(Enum):
@@ -27,7 +27,7 @@ class AiracData:
     def __init__(
         self,
         airac="",
-        source=DEFAULT_CHART_SOURCE,
+        provider=DEFAULT_CHART_PROVIDER,
         cycle_type=CycleTypes.CURRENT.value,
         cycle_chart_type=CycleChartTypes.CHARTS.value,
         valid_date=None,
@@ -36,7 +36,7 @@ class AiracData:
         airac_data_dict=None,
     ):
         self.airac = airac
-        self.source = source
+        self.provider = provider
         self.cycle_type = cycle_type
         self.cycle_chart_type = cycle_chart_type
         self.valid_date = valid_date

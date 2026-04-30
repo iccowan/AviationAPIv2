@@ -4,9 +4,9 @@ from aviationapi.lib.models.AiracData import CycleChartTypes
 
 
 def test_faa_provider_returns_expected_jobs_for_charts():
-    provider = FaaTppChartProvider()
+    chart_provider = FaaTppChartProvider()
 
-    assert provider.get_expected_jobs(CycleChartTypes.CHARTS.value) == [
+    assert chart_provider.get_expected_jobs(CycleChartTypes.CHARTS.value) == [
         "A",
         "B",
         "C",

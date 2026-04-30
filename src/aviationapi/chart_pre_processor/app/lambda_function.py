@@ -3,14 +3,14 @@ from datetime import datetime, timedelta
 import aviationapi.lib.messengers.trigger_chart_processor as TriggerChartProcessorMessenger
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
 from aviationapi.chart_processor.app.providers.registry import get_expected_jobs
-from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
+from aviationapi.lib.chart_provider_keys import DEFAULT_CHART_PROVIDER
 from aviationapi.lib.logger import logInfo
 from aviationapi.lib.models.AiracData import AiracData, CycleChartTypes, CycleTypes
 
 AIRAC_DATE_FORMAT = "%y%m%d"
 TODAY = datetime.today()
 BASE_AIRAC_WITH_CS = "250220"
-CHART_SOURCE = DEFAULT_CHART_SOURCE
+CHART_PROVIDER = DEFAULT_CHART_PROVIDER
 
 
 def airac_to_date(airac):
@@ -46,15 +46,15 @@ def deduce_current_next_airac():
 
 
 def create_airac_data(
-    airac, cycle_type, cycle_chart_type, valid_date, source=CHART_SOURCE
+    airac, cycle_type, cycle_chart_type, valid_date, provider=CHART_PROVIDER
 ):
     return AiracData(
         airac=airac,
-        source=source,
+        provider=provider,
         cycle_type=cycle_type,
         cycle_chart_type=cycle_chart_type,
         valid_date=valid_date,
-        expected_jobs=get_expected_jobs(source, cycle_chart_type),
+        expected_jobs=get_expected_jobs(provider, cycle_chart_type),
     )
 
 
@@ -62,20 +62,20 @@ def get_current_airacs():
     logInfo("Pulling airac data from DynamoDB")
 
     current_charts_airac = AiracDataRepository.get_airac(
-        CycleTypes.CURRENT.value, CycleChartTypes.CHARTS.value, source=CHART_SOURCE
+        CycleTypes.CURRENT.value, CycleChartTypes.CHARTS.value, provider=CHART_PROVIDER
     )
     next_charts_airac = AiracDataRepository.get_airac(
-        CycleTypes.NEXT.value, CycleChartTypes.CHARTS.value, source=CHART_SOURCE
+        CycleTypes.NEXT.value, CycleChartTypes.CHARTS.value, provider=CHART_PROVIDER
     )
     current_supplement_airac = AiracDataRepository.get_airac(
         CycleTypes.CURRENT.value,
         CycleChartTypes.CHART_SUPPLEMENT.value,
-        source=CHART_SOURCE,
+        provider=CHART_PROVIDER,
     )
     next_supplement_airac = AiracDataRepository.get_airac(
         CycleTypes.NEXT.value,
         CycleChartTypes.CHART_SUPPLEMENT.value,
-        source=CHART_SOURCE,
+        provider=CHART_PROVIDER,
     )
 
     if (

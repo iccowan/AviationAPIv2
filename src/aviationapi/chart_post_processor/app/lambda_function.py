@@ -1,11 +1,11 @@
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
-from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
+from aviationapi.lib.chart_provider_keys import DEFAULT_CHART_PROVIDER
 from aviationapi.lib.logger import logError, logInfo
 
 
-def get_airac_data(airac, cycle_chart_type, source=DEFAULT_CHART_SOURCE):
+def get_airac_data(airac, cycle_chart_type, provider=DEFAULT_CHART_PROVIDER):
     return AiracDataRepository.get_airac_by_cycle_chart_type_and_airac(
-        airac, cycle_chart_type, source=source
+        airac, cycle_chart_type, provider=provider
     )
 
 
@@ -27,22 +27,22 @@ def lambda_handler(event, context):
     packet = attributes["packet"]["Value"]
     airac = attributes["airac"]["Value"]
     cycle_chart_type = attributes["cycle_chart_type"]["Value"]
-    source = attributes.get("source", {}).get("Value", DEFAULT_CHART_SOURCE)
+    provider = attributes.get("provider", {}).get("Value", DEFAULT_CHART_PROVIDER)
 
-    airac_data = get_airac_data(airac, cycle_chart_type, source)
+    airac_data = get_airac_data(airac, cycle_chart_type, provider)
 
     if airac_data is None:
         logError(
-            f"No {cycle_chart_type} airac data found for source {source} airac {airac}"
+            f"No {cycle_chart_type} airac data found for provider {provider} airac {airac}"
         )
         return 1
 
     logInfo(
         f"Processing successful processing of packet {packet} "
-        f"for source {source} airac {airac} {cycle_chart_type}"
+        f"for provider {provider} airac {airac} {cycle_chart_type}"
     )
     update_airac_data(airac_data, packet)
     logInfo(
         f"Successfully saved processed status for packet {packet} "
-        f"for source {source} airac {airac} {cycle_chart_type}"
+        f"for provider {provider} airac {airac} {cycle_chart_type}"
     )

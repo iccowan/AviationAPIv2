@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class ChartProvider(ABC):
-    source = ""
+    provider = ""
 
     @abstractmethod
     def get_expected_jobs(self, cycle_chart_type):

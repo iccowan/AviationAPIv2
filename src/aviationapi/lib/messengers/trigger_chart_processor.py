@@ -2,7 +2,7 @@ import os
 
 import boto3
 
-from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
+from aviationapi.lib.chart_provider_keys import DEFAULT_CHART_PROVIDER
 
 TOPIC_ARN = os.environ.get(
     "TRIGGER_CHART_PROCESSOR_TOPIC_ARN", "trigger-chart-processor"
@@ -16,16 +16,16 @@ def publish_update_messages_for_airac(airac_data):
             _publish_message(
                 airac_data.airac,
                 packet,
-                getattr(airac_data, "source", DEFAULT_CHART_SOURCE),
+                getattr(airac_data, "provider", DEFAULT_CHART_PROVIDER),
             )
 
 
-def _publish_message(airac, packet, source=DEFAULT_CHART_SOURCE):
+def _publish_message(airac, packet, provider=DEFAULT_CHART_PROVIDER):
     TOPIC.publish(
-        Message=f"Update packet {packet} for source {source} airac {airac}",
+        Message=f"Update packet {packet} for provider {provider} airac {airac}",
         MessageAttributes={
             "airac": {"DataType": "String", "StringValue": airac},
             "packet": {"DataType": "String", "StringValue": packet},
-            "source": {"DataType": "String", "StringValue": source},
+            "provider": {"DataType": "String", "StringValue": provider},
         },
     )

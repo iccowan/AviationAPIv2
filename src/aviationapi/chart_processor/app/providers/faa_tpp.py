@@ -12,7 +12,7 @@ import aviationapi.chart_processor.app.airport_codes as AirportCodes
 import aviationapi.chart_processor.app.format_chart_db_data as ChartDataFormatter
 import aviationapi.chart_processor.app.format_cs_db_data as ChartSupplementDataFormatter
 from aviationapi.chart_processor.app.providers.base import ChartProvider
-from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE
+from aviationapi.lib.chart_provider_keys import DEFAULT_CHART_PROVIDER
 from aviationapi.lib.logger import logError, logInfo
 from aviationapi.lib.models.AiracData import CycleChartTypes
 
@@ -252,7 +252,7 @@ def process_chart_supplement(packet, airac):
 
 
 class FaaTppChartProvider(ChartProvider):
-    source = DEFAULT_CHART_SOURCE
+    provider = DEFAULT_CHART_PROVIDER
 
     def get_expected_jobs(self, cycle_chart_type):
         if cycle_chart_type == CycleChartTypes.CHART_SUPPLEMENT.value:

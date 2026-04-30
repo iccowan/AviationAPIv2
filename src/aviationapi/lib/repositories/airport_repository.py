@@ -3,7 +3,10 @@ from datetime import datetime, timedelta
 
 import boto3
 
-from aviationapi.lib.chart_data_keys import DEFAULT_CHART_SOURCE, build_airport_data_key
+from aviationapi.lib.chart_provider_keys import (
+    DEFAULT_CHART_PROVIDER,
+    build_airport_data_key,
+)
 from aviationapi.lib.models.Airport import Airport
 from aviationapi.lib.models.AirportChartSupplement import AirportChartSupplement
 
@@ -12,8 +15,8 @@ TABLE = boto3.resource("dynamodb").Table(TABLE_NAME)
 EXPIRATION_TIMESTAMP = int((datetime.now() + timedelta(days=120)).timestamp())
 
 
-def _get_airport_source(airport):
-    return getattr(airport, "source", DEFAULT_CHART_SOURCE)
+def _get_airport_provider(airport):
+    return getattr(airport, "provider", DEFAULT_CHART_PROVIDER)
 
 
 def _get_entry_type_for_airport(airport):
@@ -23,10 +26,10 @@ def _get_entry_type_for_airport(airport):
     return "tpp"
 
 
-def _build_airport_key(unique_airport_id, chart_type, airac, source):
+def _build_airport_key(unique_airport_id, chart_type, airac, provider):
     return {
         "unique_airport_id": unique_airport_id,
-        "chart_type::airac": build_airport_data_key(source, chart_type, airac),
+        "chart_type::airac": build_airport_data_key(provider, chart_type, airac),
     }
 
 
@@ -39,7 +42,7 @@ def generate_key(airport):
         id,
         _get_entry_type_for_airport(airport),
         airport.airac,
-        _get_airport_source(airport),
+        _get_airport_provider(airport),
     )
 
 
@@ -50,11 +53,11 @@ def _get_legacy_airport_key(unique_airport_id, chart_type, airac):
     }
 
 
-def _build_airport_lookup_keys(airport_name, airac, chart_type, source):
+def _build_airport_lookup_keys(airport_name, airac, chart_type, provider):
     unique_airport_id = airport_name.upper()
-    lookup_keys = [_build_airport_key(unique_airport_id, chart_type, airac, source)]
+    lookup_keys = [_build_airport_key(unique_airport_id, chart_type, airac, provider)]
 
-    if source == DEFAULT_CHART_SOURCE:
+    if provider == DEFAULT_CHART_PROVIDER:
         lookup_keys.append(
             _get_legacy_airport_key(unique_airport_id, chart_type, airac)
         )
@@ -62,10 +65,10 @@ def _build_airport_lookup_keys(airport_name, airac, chart_type, source):
     return lookup_keys
 
 
-def get_airport(airport_name, airac, chart_type, source=DEFAULT_CHART_SOURCE):
+def get_airport(airport_name, airac, chart_type, provider=DEFAULT_CHART_PROVIDER):
     airport_dict = None
     for lookup_key in _build_airport_lookup_keys(
-        airport_name, airac, chart_type, source
+        airport_name, airac, chart_type, provider
     ):
         airport_dict = _get(lookup_key)
         if airport_dict is not None:
@@ -79,7 +82,9 @@ def get_airport(airport_name, airac, chart_type, source=DEFAULT_CHART_SOURCE):
     else:
         airport = Airport(airac, airport_dict)
 
-    airport.source = airport_dict.get("source", source)
+    airport.provider = airport_dict.get(
+        "provider", airport_dict.get("source", provider)
+    )
 
     return airport
 
@@ -88,7 +93,10 @@ def put_airport(airport):
     _put(
         airport.dict()
         | generate_key(airport)
-        | {"source": _get_airport_source(airport), "expire_at": EXPIRATION_TIMESTAMP}
+        | {
+            "provider": _get_airport_provider(airport),
+            "expire_at": EXPIRATION_TIMESTAMP,
+        }
     )
 
 

@@ -2,7 +2,7 @@ from datetime import datetime
 from unittest.mock import patch
 
 from aviationapi.chart_pre_processor.app.lambda_function import (
-    CHART_SOURCE,
+    CHART_PROVIDER,
     create_airac_data,
     get_current_airacs,
 )
@@ -12,7 +12,7 @@ from aviationapi.lib.models.AiracData import AiracData, CycleChartTypes, CycleTy
 def _build_airac_data(cycle_type, cycle_chart_type):
     return AiracData(
         airac="250417",
-        source=CHART_SOURCE,
+        provider=CHART_PROVIDER,
         cycle_type=cycle_type,
         cycle_chart_type=cycle_chart_type,
         valid_date=datetime(2025, 4, 17),
@@ -37,7 +37,7 @@ def test_get_current_airacs_requests_faa_source(mock_get_airac):
     get_current_airacs()
 
     for call in mock_get_airac.call_args_list:
-        assert call.kwargs["source"] == CHART_SOURCE
+        assert call.kwargs["provider"] == CHART_PROVIDER
 
 
 def test_create_airac_data_uses_provider_expected_jobs():
