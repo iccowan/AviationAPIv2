@@ -47,7 +47,7 @@ def update_current_chart_tags(
                 )
             case "DP" | "DAU":
                 current_chart_data["current_chart_section"] = ChartType.DEPARTURE.value
-            case "STAR":
+            case "STAR" | "STR":
                 current_chart_data["current_chart_section"] = ChartType.ARRIVAL.value
             case "IAP" | "CVFP":
                 current_chart_data["current_chart_section"] = ChartType.APPROACH.value
