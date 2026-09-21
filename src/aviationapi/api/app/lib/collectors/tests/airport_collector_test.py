@@ -42,7 +42,7 @@ def test_get_current_charts_for_airport_returns_first_provider_match(
     mock_get_airport.assert_any_call("EGLL", "250417", "tpp", provider="uk_aip")
 
 
-@patch("aviationapi.api.app.lib.collectors.airport_collector.logError")
+@patch("aviationapi.api.app.lib.collectors.airport_collector.logInfo")
 @patch(
     "aviationapi.api.app.lib.collectors.airport_collector.AirportRepository.get_airport"
 )
@@ -51,7 +51,7 @@ def test_get_current_charts_for_airport_returns_first_provider_match(
 )
 @patch("aviationapi.api.app.lib.collectors.airport_collector.get_providers")
 def test_get_current_charts_for_airport_logs_when_multiple_providers_match(
-    mock_get_providers, mock_get_airac, mock_get_airport, mock_log_error
+    mock_get_providers, mock_get_airac, mock_get_airport, mock_log_info
 ):
     mock_get_providers.return_value = [
         Mock(provider="faa_tpp"),
@@ -66,4 +66,4 @@ def test_get_current_charts_for_airport_logs_when_multiple_providers_match(
     charts = AirportCollector.get_current_charts_for_airport("EGLL")
 
     assert charts == {"provider": "faa"}
-    mock_log_error.assert_called_once()
+    mock_log_info.assert_called_once()

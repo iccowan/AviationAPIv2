@@ -1,7 +1,7 @@
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
 import aviationapi.lib.repositories.airport_repository as AirportRepository
 from aviationapi.chart_processor.app.providers.registry import get_providers
-from aviationapi.lib.logger import logError
+from aviationapi.lib.logger import logInfo
 
 
 def _get_airport_chart_type(chart_type):
@@ -47,7 +47,7 @@ def _get_airport(airport, chart_cycle_type, chart_type):
 
     if len(provider_matches) > 1:
         matched_providers = ", ".join([match["provider"] for match in provider_matches])
-        logError(
+        logInfo(
             f"Airport {airport} matched multiple providers "
             f"for {chart_type}: {matched_providers}"
         )
