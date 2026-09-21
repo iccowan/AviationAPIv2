@@ -3,7 +3,7 @@ class AirportData:
         self.city = None
         self.state_abbr = None
         self.state_full = None
-        self.country = "USA"
+        self.country = None
         self.reset_airport_specific()
 
         if airport_data_dict is not None:

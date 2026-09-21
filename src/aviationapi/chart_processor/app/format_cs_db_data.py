@@ -18,6 +18,7 @@ def update_current_tags(
             airport_data["skip"] = True
 
         current_airport.airport_data.faa_ident = text
+        current_airport.airport_data.country = "USA"
         if text in airport_codes:
             current_airport.airport_data.icao_ident = airport_codes[text]
 

@@ -15,6 +15,7 @@ def update_current_airport_tags(current_airport, event, element, tag, text):
     if event == START_EVENT and tag == "state_code":
         current_airport.airport_data.state_abbr = element.attrib["ID"]
         current_airport.airport_data.state_full = element.attrib["state_fullname"]
+        current_airport.airport_data.country = "USA"
     if event == START_EVENT and tag == "city_name":
         current_airport.airport_data.city = element.attrib["ID"]
     if event == START_EVENT and tag == "airport_name":
@@ -22,6 +23,7 @@ def update_current_airport_tags(current_airport, event, element, tag, text):
         current_airport.airport_data.faa_ident = element.attrib["apt_ident"]
         current_airport.airport_data.icao_ident = element.attrib["icao_ident"]
         current_airport.airport_data.is_military = element.attrib["military"] == "M"
+        current_airport.airport_data.country = "USA"
 
 
 def update_current_chart_tags(
