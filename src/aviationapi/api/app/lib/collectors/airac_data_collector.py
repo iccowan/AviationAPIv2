@@ -1,5 +1,5 @@
 import aviationapi.lib.repositories.airac_data_repository as AiracDataRepository
-from aviationapi.chart_processor.app.providers.registry import get_providers
+from aviationapi.lib.providers.registry import get_providers
 
 
 def _get_availability(cycle_chart_type):
